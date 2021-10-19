@@ -22,7 +22,7 @@ void try_catch_wrapper(void (*action)())
 
 void usage()
 {
-    std::cout << "Usage:\n  udp - run UDP client\n  tsp - run TCP client\n  nothing - run TCP/UDP server" << std::endl;
+    std::cout << "Usage:\n  udp - run UDP client\n  tcp - run TCP client\n  nothing - run TCP/UDP server" << std::endl;
 }
 
 void application::run(int argc, char *argv[])
