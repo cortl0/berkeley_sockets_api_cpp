@@ -20,29 +20,17 @@ tcp_server::tcp_server(ushort port) : communicator(PF_INET, SOCK_STREAM, IPPROTO
 void tcp_server::start(bool& stop)
 {
     if (-1 == bind(file_descriptor, reinterpret_cast<struct sockaddr*>(&address), sizeof(struct sockaddr)))
-    {
-        close(file_descriptor);
-
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);
-    }
 
     if (-1 == listen(file_descriptor, 10))
-    {
-        close(file_descriptor);
-
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);
-    }
 
     while (!stop)
     {
         int connect_file_descriptor = accept(file_descriptor, nullptr, nullptr);
 
         if (-1 == connect_file_descriptor)
-        {
-            close(file_descriptor);
-
             throw std::runtime_error(ERROR_STRING_BY_ERRNO);
-        }
 
         bool ok = false;
 
@@ -72,9 +60,7 @@ void tcp_server::start(bool& stop)
                 shutdown(connect_file_descriptor_, SHUT_RDWR);
 
                 close(connect_file_descriptor_);
-            } catch (...) {
-
-            }
+            } catch (...) { }
 
         }).detach();
 

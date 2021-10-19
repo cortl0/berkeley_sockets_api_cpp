@@ -32,20 +32,22 @@ void udp_server::start(bool& stop)
 
         std::thread([&]()
         {
-            std::string str_(str);
+            try
+            {
+                std::string str_(str);
 
-            struct sockaddr_in address_ = address;
+                struct sockaddr_in address_ = address;
 
-            ok = true;
+                ok = true;
 
-            std::cout << "udp <<< " << str_ << std::endl;
+                std::cout << "udp <<< " << str_ << std::endl;
 
-            str_ = business_logic::business_logic::calculate(str_);
+                str_ = business_logic::business_logic::calculate(str_);
 
-            send(file_descriptor, str_, address_);
+                send(file_descriptor, str_, address_);
 
-            std::cout << "udp >>> " << str_ << std::endl;
-
+                std::cout << "udp >>> " << str_ << std::endl;
+            } catch (...) { }
         }).detach();
 
         while(!ok)

@@ -2,10 +2,31 @@
 
 #include "application.h"
 
+static bool stop = false;
+
+void try_catch_wrapper(void (*action)())
+{
+    try
+    {
+        action();
+    }
+    catch (std::runtime_error e)
+    {
+        std::cout << "error: " << e.what() << std::endl;
+    }
+    catch (...)
+    {
+        std::cout << "unknown error" << std::endl;
+    }
+}
+
+void usage()
+{
+    std::cout << "Usage:\n  udp - run UDP client\n  tsp - run TCP client\n  nothing - run TCP/UDP server" << std::endl;
+}
+
 void application::run(int argc, char *argv[])
 {
-    bool stop = false;
-
     switch (argc)
     {
     case 1:
@@ -14,50 +35,73 @@ void application::run(int argc, char *argv[])
 
         std::thread ([&]()
         {
-            communicate::udp_server comm(UDP_SERVER_PORT);
+            try_catch_wrapper([]()
+            {
+                communicate::udp_server comm(UDP_SERVER_PORT);
 
-            comm.start(stop);
+                comm.start(stop);
+            });
         }).detach();
 
         std::thread ([&]()
         {
-            communicate::tcp_server comm(TCP_SERVER_PORT);
+            try_catch_wrapper([]()
+            {
+                communicate::tcp_server comm(TCP_SERVER_PORT);
 
-            comm.start(stop);
+                comm.start(stop);
+            });
         }).detach();
 
         std::cin >> argc;
 
         break;
     }
+
     case 2:
     {
         if(0 == strcmp(argv[1], "udp"))
         {
             std::cout << "udp client start" << std::endl;
 
-            communicate::udp_client comm(LOCALHOST_ADDRESS, UDP_SERVER_PORT);
+            try_catch_wrapper([]()
+            {
+                communicate::udp_client comm(LOCALHOST_ADDRESS, UDP_SERVER_PORT);
 
-            comm.start(stop);
+                comm.start(stop);
+            });
         }
         else if(0 == strcmp(argv[1], "tcp"))
         {
             std::cout << "tcp client start" << std::endl;
 
-            communicate::tcp_client comm(LOCALHOST_ADDRESS, TCP_SERVER_PORT);
+            try_catch_wrapper([]()
+            {
+                communicate::tcp_client comm(LOCALHOST_ADDRESS, TCP_SERVER_PORT);
 
-            comm.start(stop);
+                comm.start(stop);
+            });
         }
         else
-            throw std::runtime_error("wrong argv" + WHERE_ERROR);
+        {
+            std::cout << "error: " << "wrong argv" + WHERE_ERROR << std::endl;
+
+            usage();
+        }
 
         break;
     }
 
     default:
     {
-        throw std::runtime_error("wrong argc" + WHERE_ERROR);
+        std::cout << "error: " << "wrong argc" + WHERE_ERROR << std::endl;
+
+        usage();
+
+        break;
     }
     }
 }
+
+
 

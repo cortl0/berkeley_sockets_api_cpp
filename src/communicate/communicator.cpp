@@ -5,18 +5,14 @@ namespace communicate
 
 communicator::~communicator()
 {
-
+    close(file_descriptor);
 }
 
 communicator::communicator(int domain, int type, int protocol)
     : file_descriptor(socket(domain, type, protocol))
 {
     if (file_descriptor == -1)
-    {
-        close(file_descriptor);
-
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);
-    }
 
     address.sin_family = PF_INET;
     sender_address.sin_family = PF_INET;
