@@ -11,7 +11,7 @@ class udp_server : public communicator
 public:
     virtual ~udp_server();
     udp_server(ushort port);
-    virtual void start(bool& stop);
+    virtual void start(bool &stop);
 };
 
 }

@@ -20,13 +20,16 @@ udp_server::udp_server(ushort port) : communicator(PF_INET, SOCK_DGRAM, IPPROTO_
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);
 }
 
-void udp_server::start(bool& stop)
+void udp_server::start(bool &stop)
 {
     while (!stop)
     {
         struct sockaddr_in address;
 
         std::string str(receive(file_descriptor, address));
+
+        if(str.size() == 0)
+            continue;
 
         bool ok = false;
 

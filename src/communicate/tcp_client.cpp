@@ -14,7 +14,7 @@ tcp_client::tcp_client(uint server_addres, ushort server_port) : communicator(PF
     address.sin_port = htons(server_port);
 }
 
-void tcp_client::start(bool& stop)
+void tcp_client::start(bool &stop)
 {
     if (-1 == connect(file_descriptor, reinterpret_cast<struct sockaddr*>(&address), sizeof(struct sockaddr_in)))
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);

@@ -27,13 +27,13 @@ protected:
     int file_descriptor;
     struct sockaddr_in sender_address, address;
 
-    std::string receive(int file_descriptor, sockaddr_in& address);
-    void send(int file_descriptor, const std::string& str, sockaddr_in& address);
+    std::string receive(const int &file_descriptor, sockaddr_in& address) const;
+    void send(const int &file_descriptor, const std::string& str, sockaddr_in& address) const;
 
 public:
     virtual ~communicator();
     communicator(int domain, int type, int protocol);
-    virtual void start(bool& stop) = 0;
+    virtual void start(bool &stop) = 0;
 };
 
 }

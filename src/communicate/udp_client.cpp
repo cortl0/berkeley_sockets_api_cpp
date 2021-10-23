@@ -14,7 +14,7 @@ udp_client::udp_client(uint server_addres, ushort server_port) : communicator(PF
     address.sin_port = htons(server_port);
 }
 
-void udp_client::start(bool& stop)
+void udp_client::start(bool &stop)
 {
     while (!stop)
     {

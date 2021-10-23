@@ -11,7 +11,7 @@ class tcp_client : public communicator
 public:
     virtual ~tcp_client();
     tcp_client(uint server_addres, ushort server_port);
-    virtual void start(bool& stop);
+    virtual void start(bool &stop);
 };
 
 }

@@ -9,7 +9,7 @@ namespace business_logic
 class business_logic
 {
 public:
-    static std::string calculate(const std::string&);
+    static std::string calculate(const std::string &);
 };
 
 }

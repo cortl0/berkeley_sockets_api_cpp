@@ -9,7 +9,6 @@
 /**
  * @brief The application class
  *
- * @todo Fix tcp_server crash on loss of conection with tcp_client
  * @todo For real use split into server and client parts
  * @todo Release file descriptor on SIGKILL
  */

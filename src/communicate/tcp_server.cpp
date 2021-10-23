@@ -17,7 +17,7 @@ tcp_server::tcp_server(ushort port) : communicator(PF_INET, SOCK_STREAM, IPPROTO
     address.sin_port = htons(port);
 }
 
-void tcp_server::start(bool& stop)
+void tcp_server::start(bool &stop)
 {
     if (-1 == bind(file_descriptor, reinterpret_cast<struct sockaddr*>(&address), sizeof(struct sockaddr)))
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);
@@ -46,7 +46,10 @@ void tcp_server::start(bool& stop)
 
                 while (!stop)
                 {
-                    std::string  str(receive(connect_file_descriptor_, address));
+                    std::string str(receive(connect_file_descriptor_, address));
+
+                    if(str.size() == 0)
+                        continue;
 
                     std::cout << "tcp <<< " << str << std::endl;
 

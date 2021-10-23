@@ -18,7 +18,7 @@ communicator::communicator(int domain, int type, int protocol)
     sender_address.sin_family = PF_INET;
 }
 
-std::string communicator::receive(int file_descriptor, sockaddr_in& address)
+std::string communicator::receive(const int &file_descriptor, sockaddr_in& address) const
 {
     socklen_t address_length = 16;
 
@@ -31,7 +31,7 @@ std::string communicator::receive(int file_descriptor, sockaddr_in& address)
     return std::string(buffer);
 }
 
-void communicator::send(int file_descriptor, const std::string& str, sockaddr_in& address)
+void communicator::send(const int &file_descriptor, const std::string& str, sockaddr_in& address) const
 {
     if (-1 == sendto(
                 file_descriptor,

@@ -11,7 +11,7 @@ class tcp_server : public communicator
 public:
     virtual ~tcp_server();
     tcp_server(ushort port);
-    virtual void start(bool& stop);
+    virtual void start(bool &stop);
 };
 
 }

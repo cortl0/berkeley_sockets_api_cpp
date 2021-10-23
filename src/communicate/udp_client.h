@@ -11,7 +11,7 @@ class udp_client : public communicator
 public:
     virtual ~udp_client();
     udp_client(uint server_addres, ushort server_port);
-    virtual void start(bool& stop);
+    virtual void start(bool &stop);
 };
 
 }
