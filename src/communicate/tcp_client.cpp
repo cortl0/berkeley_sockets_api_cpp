@@ -19,6 +19,8 @@ void tcp_client::start(bool &stop)
     if (-1 == connect(file_descriptor, reinterpret_cast<struct sockaddr*>(&address), sizeof(struct sockaddr_in)))
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);
 
+    struct sockaddr_in sender_address;
+
     while (!stop)
     {
         std::string str;

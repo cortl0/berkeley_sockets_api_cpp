@@ -15,23 +15,26 @@ communicator::communicator(int domain, int type, int protocol)
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);
 
     address.sin_family = PF_INET;
-    sender_address.sin_family = PF_INET;
 }
 
-std::string communicator::receive(const int &file_descriptor, sockaddr_in& address) const
+std::string communicator::receive(const int &file_descriptor, sockaddr_in &address) const
 {
     socklen_t address_length = 16;
 
-    char buffer[COMMUNICATOR_BUFFER_SIZE] = {};
+    char buffer[COMMUNICATOR_BUFFER_SIZE];
 
-    if (-1 == recvfrom(file_descriptor, reinterpret_cast<void*>(buffer), COMMUNICATOR_BUFFER_SIZE, 0,
-                       reinterpret_cast<struct sockaddr*>(&address), &address_length ))
+    auto number_of_bytes_read = recvfrom(file_descriptor, reinterpret_cast<void*>(buffer), COMMUNICATOR_BUFFER_SIZE - 1, 0,
+                                         reinterpret_cast<struct sockaddr*>(&address), &address_length);
+
+    if (-1 == number_of_bytes_read)
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);
+
+    buffer[number_of_bytes_read] = '\0';
 
     return std::string(buffer);
 }
 
-void communicator::send(const int &file_descriptor, const std::string& str, sockaddr_in& address) const
+void communicator::send(const int &file_descriptor, const std::string &str, sockaddr_in &address) const
 {
     if (-1 == sendto(
                 file_descriptor,

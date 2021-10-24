@@ -16,6 +16,8 @@ udp_client::udp_client(uint server_addres, ushort server_port) : communicator(PF
 
 void udp_client::start(bool &stop)
 {
+    struct sockaddr_in sender_address;
+
     while (!stop)
     {
         std::string str;
