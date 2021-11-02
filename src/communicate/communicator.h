@@ -1,11 +1,16 @@
+/**
+ *   berkeley_sockets
+ *   created by Ilya Shishkin
+ *   cortl@8iter.ru
+ *   https://github.com/cortl0/berkeley_sockets
+ *   licensed by GPL v3.0
+ */
+
 #ifndef COMMUNICATOR_H
 #define COMMUNICATOR_H
 
 #include <iostream>
 
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <netdb.h>
 #include <string.h>
 #include <unistd.h>
@@ -25,6 +30,7 @@ class communicator
 {
 protected:
     int file_descriptor;
+    bool stopped = true;
     struct sockaddr_in address;
 
     std::string receive(const int &file_descriptor, sockaddr_in &address) const;
@@ -33,6 +39,7 @@ protected:
 public:
     virtual ~communicator();
     communicator(int domain, int type, int protocol);
+    bool is_stopped();
     virtual void start(bool &stop) = 0;
 };
 

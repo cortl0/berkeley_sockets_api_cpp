@@ -1,3 +1,11 @@
+/**
+ *   berkeley_sockets
+ *   created by Ilya Shishkin
+ *   cortl@8iter.ru
+ *   https://github.com/cortl0/berkeley_sockets
+ *   licensed by GPL v3.0
+ */
+
 #include <thread>
 
 #include "tcp_server.h"
@@ -17,6 +25,11 @@ tcp_server::tcp_server(ushort port) : communicator(PF_INET, SOCK_STREAM, IPPROTO
     address.sin_port = htons(port);
 }
 
+bool tcp_server::get_stopped()
+{
+    return stopped;
+}
+
 void tcp_server::start(bool &stop)
 {
     if (-1 == bind(file_descriptor, reinterpret_cast<struct sockaddr*>(&address), sizeof(struct sockaddr)))
@@ -25,50 +38,62 @@ void tcp_server::start(bool &stop)
     if (-1 == listen(file_descriptor, 10))
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);
 
-    while (!stop)
+    stopped = false;
+
+    try
     {
-        int connect_file_descriptor = accept(file_descriptor, nullptr, nullptr);
-
-        if (-1 == connect_file_descriptor)
-            throw std::runtime_error(ERROR_STRING_BY_ERRNO);
-
-        bool ok = false;
-
-        std::thread([&]()
+        while (!stop)
         {
-            try
+            int connect_file_descriptor = accept(file_descriptor, nullptr, nullptr);
+
+            if (-1 == connect_file_descriptor)
+                throw std::runtime_error(ERROR_STRING_BY_ERRNO);
+
+            bool ok = false;
+
+            std::thread([&]()
             {
-                int connect_file_descriptor_ = connect_file_descriptor;
-
-                ok = true;
-
-                struct sockaddr_in address;
-
-                while (!stop)
+                try
                 {
-                    std::string str(receive(connect_file_descriptor_, address));
+                    int connect_file_descriptor_ = connect_file_descriptor;
 
-                    if(str.size() == 0)
-                        continue;
+                    ok = true;
 
-                    std::cout << "tcp <<< " << str << std::endl;
+                    struct sockaddr_in address;
 
-                    str = business_logic::business_logic::calculate(str);
+                    while (!stop)
+                    {
+                        std::string str(receive(connect_file_descriptor_, address));
 
-                    send(connect_file_descriptor_, str, address);
+                        if(str.size() == 0)
+                            continue;
 
-                    std::cout << "tcp >>> " << str << std::endl;
-                }
+                        std::cout << "tcp <<< " << str << std::endl;
 
-                shutdown(connect_file_descriptor_, SHUT_RDWR);
+                        str = business_logic::business_logic::calculate(str);
 
-                close(connect_file_descriptor_);
-            } catch (...) { }
+                        send(connect_file_descriptor_, str, address);
 
-        }).detach();
+                        std::cout << "tcp >>> " << str << std::endl;
+                    }
 
-        while(!ok)
-            usleep(10);
+                    shutdown(connect_file_descriptor_, SHUT_RDWR);
+
+                    close(connect_file_descriptor_);
+                } catch (...) { }
+
+            }).detach();
+
+            while(!ok)
+                usleep(10);
+        }
+
+        stopped = true;
+    }
+    catch (...)
+    {
+        stopped = true;
+        throw ;
     }
 }
 

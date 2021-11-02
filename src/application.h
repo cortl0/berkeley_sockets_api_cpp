@@ -1,10 +1,13 @@
+/**
+ *   berkeley_sockets
+ *   created by Ilya Shishkin
+ *   cortl@8iter.ru
+ *   https://github.com/cortl0/berkeley_sockets
+ *   licensed by GPL v3.0
+ */
+
 #ifndef APPLICATION_H
 #define APPLICATION_H
-
-#include "communicate/udp_client.h"
-#include "communicate/udp_server.h"
-#include "communicate/tcp_client.h"
-#include "communicate/tcp_server.h"
 
 /**
  * @brief The application class
@@ -15,6 +18,8 @@
 class application
 {
 public:
+    ~application();
+
     /**
      * @brief run
      * @param argc - from main

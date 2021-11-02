@@ -1,3 +1,11 @@
+/**
+ *   berkeley_sockets
+ *   created by Ilya Shishkin
+ *   cortl@8iter.ru
+ *   https://github.com/cortl0/berkeley_sockets
+ *   licensed by GPL v3.0
+ */
+
 #include "udp_client.h"
 
 namespace communicate
@@ -18,15 +26,33 @@ void udp_client::start(bool &stop)
 {
     struct sockaddr_in sender_address;
 
-    while (!stop)
+    stopped = false;
+
+    try
     {
-        std::string str;
+        while (!stop)
+        {
+            std::string str;
 
-        std::getline(std::cin, str);
+            std::getline(std::cin, str);
 
-        send(file_descriptor, str, address);
+            if(str == "stop")
+            {
+                stop = true;
+                break;
+            }
 
-        std::cout << receive(file_descriptor, sender_address) << std::endl;
+            send(file_descriptor, str, address);
+
+            std::cout << receive(file_descriptor, sender_address) << std::endl;
+        }
+
+        stopped = true;
+    }
+    catch (...)
+    {
+        stopped = true;
+        throw ;
     }
 }
 

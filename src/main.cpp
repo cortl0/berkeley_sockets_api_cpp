@@ -1,3 +1,11 @@
+/**
+ *   berkeley_sockets
+ *   created by Ilya Shishkin
+ *   cortl@8iter.ru
+ *   https://github.com/cortl0/berkeley_sockets
+ *   licensed by GPL v3.0
+ */
+
 #include <iostream>
 
 #include "application.h"
@@ -12,13 +20,13 @@ int main(int argc, char *argv[])
     }
     catch(std::runtime_error& e)
     {
-        std::cout << "error: " << e.what() << std::endl;
+        std::cerr << "error: " << e.what() << std::endl;
 
         return EXIT_FAILURE;
     }
     catch(...)
     {
-        std::cout << "unknown error" << std::endl;
+        std::cerr << "unknown error" << std::endl;
 
         return EXIT_FAILURE;
     }

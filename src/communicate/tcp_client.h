@@ -1,3 +1,11 @@
+/**
+ *   berkeley_sockets
+ *   created by Ilya Shishkin
+ *   cortl@8iter.ru
+ *   https://github.com/cortl0/berkeley_sockets
+ *   licensed by GPL v3.0
+ */
+
 #ifndef TCP_CLIENT_H
 #define TCP_CLIENT_H
 
@@ -6,12 +14,12 @@
 namespace communicate
 {
 
-class tcp_client : public communicator
+class tcp_client final : public communicator
 {
 public:
-    virtual ~tcp_client();
+    virtual ~tcp_client() override;
     tcp_client(uint server_addres, ushort server_port);
-    virtual void start(bool &stop);
+    virtual void start(bool &stop) final;
 };
 
 }

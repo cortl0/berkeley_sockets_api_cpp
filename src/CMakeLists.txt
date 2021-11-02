@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(berkeley_sockets_cpp)
+project(berkeley_sockets)
 
 set(SOURCE
 	main.cpp

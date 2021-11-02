@@ -1,3 +1,11 @@
+/**
+ *   berkeley_sockets
+ *   created by Ilya Shishkin
+ *   cortl@8iter.ru
+ *   https://github.com/cortl0/berkeley_sockets
+ *   licensed by GPL v3.0
+ */
+
 #include <algorithm>
 #include <set>
 
@@ -9,7 +17,9 @@ namespace business_logic
 
 std::string business_logic::calculate(const std::string &str)
 {
-    auto strings = string_extensions::split(str, ' ');
+    auto strings = string_extensions::split(
+                string_extensions::remove_all(
+                    string_extensions::remove_all(str, ','), '.'), ' ');
 
     std::multiset<int> nums;
 

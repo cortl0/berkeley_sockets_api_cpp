@@ -1,3 +1,11 @@
+/**
+ *   berkeley_sockets
+ *   created by Ilya Shishkin
+ *   cortl@8iter.ru
+ *   https://github.com/cortl0/berkeley_sockets
+ *   licensed by GPL v3.0
+ */
+
 #ifndef TCP_SERVER_H
 #define TCP_SERVER_H
 
@@ -6,12 +14,13 @@
 namespace communicate
 {
 
-class tcp_server : public communicator
+class tcp_server final : public communicator
 {
 public:
-    virtual ~tcp_server();
+    virtual ~tcp_server() override;
     tcp_server(ushort port);
-    virtual void start(bool &stop);
+    bool get_stopped();
+    virtual void start(bool &stop) final;
 };
 
 }
