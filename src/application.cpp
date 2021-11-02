@@ -42,7 +42,7 @@ void try_catch_wrapper(void (*action)())
 void usage()
 {
     std::cout << "Usage:" << std::endl << std::endl;
-    std::cout << "\tberkeley_socket [key]" << std::endl << std::endl;
+    std::cout << "\tberkeley_sockets [key]" << std::endl << std::endl;
     std::cout << "\tKeys:" << std::endl;
     std::cout << "\t\t--help         - this help" << std::endl;
     std::cout << "\t\ttcp            - run TCP client" << std::endl;

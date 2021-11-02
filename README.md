@@ -1,5 +1,5 @@
 # berkeley_sockets_api_cpp
-Wrap for Berkeley Sockets API on C++
+C++ wrapper for the Berkeley Sockets API
 
 ## Author
 Ilya Shishkin  
