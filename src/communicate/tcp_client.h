@@ -18,7 +18,7 @@ class tcp_client final : public communicator
 {
 public:
     virtual ~tcp_client() override;
-    tcp_client(uint server_addres, ushort server_port);
+    explicit tcp_client(uint server_addres, ushort server_port);
     virtual void start(bool &stop) final;
 };
 

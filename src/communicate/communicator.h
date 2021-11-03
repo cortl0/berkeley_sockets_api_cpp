@@ -38,7 +38,7 @@ protected:
 
 public:
     virtual ~communicator();
-    communicator(int domain, int type, int protocol);
+    explicit communicator(int domain, int type, int protocol);
     bool is_stopped();
     virtual void start(bool &stop) = 0;
 };

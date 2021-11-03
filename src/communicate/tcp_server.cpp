@@ -49,6 +49,15 @@ void tcp_server::start(bool &stop)
             if (-1 == connect_file_descriptor)
                 throw std::runtime_error(ERROR_STRING_BY_ERRNO);
 
+            if(stop)
+            {
+                shutdown(connect_file_descriptor, SHUT_RDWR);
+
+                close(connect_file_descriptor);
+
+                break;
+            }
+
             bool ok = false;
 
             std::thread([&]()

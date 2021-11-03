@@ -53,7 +53,7 @@ void usage()
 application::~application()
 {
     while(std::any_of(communicators.begin(), communicators.end(),
-                      [&](std::shared_ptr<communicate::communicator> &c)
+                      [&](const std::shared_ptr<communicate::communicator> &c)
     { return !c->is_stopped(); }))
         sleep(1);
 }

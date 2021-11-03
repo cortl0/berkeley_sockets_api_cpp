@@ -18,7 +18,7 @@ class tcp_server final : public communicator
 {
 public:
     virtual ~tcp_server() override;
-    tcp_server(ushort port);
+    explicit tcp_server(ushort port);
     bool get_stopped();
     virtual void start(bool &stop) final;
 };
