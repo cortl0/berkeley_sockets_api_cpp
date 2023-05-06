@@ -71,12 +71,18 @@ void tcp_server::start(bool& stop)
                     while(!stop)
                     {
                         buffer b;
-                        receive(connect_file_descriptor_, b, address);
+                        ssize_t number_of_bytes = receive(connect_file_descriptor_, b, address);
+
+                        if(-1 == number_of_bytes)
+                            break;
 
                         if(!business_logic::business_logic::calculate(b, 0))
                             continue;
 
-                        send(connect_file_descriptor_, b, address);
+                        number_of_bytes = send(connect_file_descriptor_, b, address);
+
+                        if(-1 == number_of_bytes)
+                            break;
                     }
 
                     shutdown(connect_file_descriptor_, SHUT_RDWR);

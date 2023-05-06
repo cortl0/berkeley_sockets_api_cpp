@@ -41,7 +41,10 @@ void udp_server::start(bool& stop)
         {
             struct sockaddr_in address;
             buffer b;
-            receive(file_descriptor, b, address);
+            ssize_t number_of_bytes = receive(file_descriptor, b, address);
+
+            if(-1 == number_of_bytes)
+                break;
 
             if(!business_logic::business_logic::calculate(b, 1))
                 continue;
@@ -49,7 +52,10 @@ void udp_server::start(bool& stop)
             try
             {
                 struct sockaddr_in address_ = address;
-                send(file_descriptor, b, address_);
+                number_of_bytes = send(file_descriptor, b, address_);
+
+                if(-1 == number_of_bytes)
+                    break;
             } catch(...) { }
         }
 
