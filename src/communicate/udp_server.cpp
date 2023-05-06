@@ -6,8 +6,6 @@
  *   licensed by GPL v3.0
  */
 
-#include <thread>
-
 #include "udp_server.h"
 #include "../business_logic/business_logic.h"
 
@@ -30,53 +28,34 @@ bool udp_server::get_stopped()
     return stopped;
 }
 
-void udp_server::start(bool &stop)
+void udp_server::start(bool& stop)
 {
-    if (-1 == bind(file_descriptor, reinterpret_cast<struct sockaddr*>(&address), sizeof(struct sockaddr)))
+    if(-1 == bind(file_descriptor, reinterpret_cast<struct sockaddr*>(&address), sizeof(struct sockaddr)))
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);
 
     stopped = false;
 
     try
     {
-        while (!stop)
+        while(!stop)
         {
             struct sockaddr_in address;
+            buffer b;
+            receive(file_descriptor, b, address);
 
-            std::string str(receive(file_descriptor, address));
-
-            if(str.size() == 0)
+            if(!business_logic::business_logic::calculate(b, 1))
                 continue;
 
-            bool ok = false;
-
-            std::thread([&]()
+            try
             {
-                try
-                {
-                    std::string str_(str);
-
-                    struct sockaddr_in address_ = address;
-
-                    ok = true;
-
-                    std::cout << "udp <<< " << str_ << std::endl;
-
-                    str_ = business_logic::business_logic::calculate(str_);
-
-                    send(file_descriptor, str_, address_);
-
-                    std::cout << "udp >>> " << str_ << std::endl;
-                } catch (...) { }
-            }).detach();
-
-            while(!ok)
-                usleep(10);
+                struct sockaddr_in address_ = address;
+                send(file_descriptor, b, address_);
+            } catch(...) { }
         }
 
         stopped = true;
     }
-    catch (...)
+    catch(...)
     {
         stopped = true;
         throw ;

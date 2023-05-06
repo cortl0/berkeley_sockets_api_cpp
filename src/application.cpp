@@ -29,11 +29,11 @@ void try_catch_wrapper(void (*action)())
     {
         action();
     }
-    catch (std::runtime_error e)
+    catch(const std::runtime_error& e)
     {
         std::cerr << "error: " << e.what() << std::endl;
     }
-    catch (...)
+    catch(...)
     {
         std::cerr << "unknown error" << std::endl;
     }
@@ -53,20 +53,20 @@ void usage()
 application::~application()
 {
     while(std::any_of(communicators.begin(), communicators.end(),
-                      [&](const std::shared_ptr<communicate::communicator> &c)
+                      [&](const std::shared_ptr<communicate::communicator>& c)
     { return !c->is_stopped(); }))
         sleep(1);
 }
 
 void application::run(int argc, char *argv[])
 {
-    switch (argc)
+    switch(argc)
     {
     case 1:
     {
         std::cout << "server start" << std::endl;
 
-        std::thread ([&]()
+        std::thread([&]()
         {
             try_catch_wrapper([]()
             {
@@ -78,7 +78,7 @@ void application::run(int argc, char *argv[])
             });
         }).detach();
 
-        std::thread ([&]()
+        std::thread([&]()
         {
             try_catch_wrapper([]()
             {

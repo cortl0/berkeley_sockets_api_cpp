@@ -23,7 +23,7 @@ communicator::~communicator()
 communicator::communicator(int domain, int type, int protocol)
     : file_descriptor(socket(domain, type, protocol))
 {
-    if (file_descriptor == -1)
+    if(file_descriptor == -1)
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);
 
     address.sin_family = PF_INET;
@@ -34,40 +34,37 @@ bool communicator::is_stopped()
     return stopped;
 }
 
-std::string communicator::receive(const int &file_descriptor, sockaddr_in &address) const
+ssize_t communicator::receive(int file_descriptor, buffer& b, sockaddr_in& address) const
 {
     socklen_t address_length = 16;
 
-    char buffer[COMMUNICATOR_BUFFER_SIZE];
+    ssize_t number_of_bytes_read = recvfrom(file_descriptor, b.data, b.size, 0,
+                                            reinterpret_cast<struct sockaddr*>(&address), &address_length);
 
-    auto const number_of_bytes_read = recvfrom(file_descriptor, reinterpret_cast<void*>(buffer), COMMUNICATOR_BUFFER_SIZE - 1, 0,
-                                               reinterpret_cast<struct sockaddr*>(&address), &address_length);
+    if(-1 == number_of_bytes_read)
+        std::cerr << ERROR_STRING_BY_ERRNO << std::endl;
 
-    if (1 > number_of_bytes_read)
-        throw std::runtime_error(ERROR_STRING_BY_ERRNO);
-
-    if (COMMUNICATOR_BUFFER_SIZE <= number_of_bytes_read)
-        throw std::runtime_error(ERROR_STRING_BY_ERRNO);
-
-    buffer[number_of_bytes_read] = '\0';
-
-    return std::string(buffer);
+    return number_of_bytes_read;
 }
 
-void communicator::send(const int &file_descriptor, const std::string &str, sockaddr_in &address) const
+ssize_t communicator::send(int file_descriptor, const buffer& b, const sockaddr_in& address) const
 {
-    if (COMMUNICATOR_BUFFER_SIZE <= str.size())
+    if(COMMUNICATOR_BUFFER_SIZE <= b.size)
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);
 
-    if (-1 == sendto(
+    ssize_t number_of_bytes_sent = sendto(
                 file_descriptor,
-                str.c_str(),
-                str.length() + 1,
+                b.data,
+                b.size,
                 0,
-                reinterpret_cast<struct sockaddr*>(&address),
+                reinterpret_cast<const struct sockaddr*>(&address),
                 sizeof(struct sockaddr_in)
-                ))
-        throw std::runtime_error(ERROR_STRING_BY_ERRNO);
+            );
+
+    if(-1 == number_of_bytes_sent)
+        std::cerr << ERROR_STRING_BY_ERRNO << std::endl;
+
+    return number_of_bytes_sent;
 }
 
-}
+} // namespace communicate

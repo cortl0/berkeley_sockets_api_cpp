@@ -17,9 +17,9 @@ namespace communicate
 class tcp_client final : public communicator
 {
 public:
-    virtual ~tcp_client() override;
+    ~tcp_client() final;
     explicit tcp_client(uint server_addres, ushort server_port);
-    virtual void start(bool &stop) final;
+    void start(bool& stop) final;
 };
 
 }

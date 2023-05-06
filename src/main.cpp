@@ -15,19 +15,16 @@ int main(int argc, char *argv[])
     try
     {
         application app;
-
         app.run(argc, argv);
     }
-    catch(std::runtime_error& e)
+    catch(const std::runtime_error& e)
     {
         std::cerr << "error: " << e.what() << std::endl;
-
         return EXIT_FAILURE;
     }
     catch(...)
     {
         std::cerr << "unknown error" << std::endl;
-
         return EXIT_FAILURE;
     }
 

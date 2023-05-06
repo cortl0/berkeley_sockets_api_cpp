@@ -17,10 +17,10 @@ namespace communicate
 class tcp_server final : public communicator
 {
 public:
-    virtual ~tcp_server() override;
+    ~tcp_server() final;
     explicit tcp_server(ushort port);
     bool get_stopped();
-    virtual void start(bool &stop) final;
+    void start(bool& stop) final;
 };
 
 }

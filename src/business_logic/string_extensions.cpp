@@ -13,12 +13,12 @@
 namespace business_logic
 {
 
-std::list<std::string> string_extensions::split(const std::string &str, const char &delimiter)
+std::list<std::string> string_extensions::split(const std::string& str, const char& delimiter)
 {
     std::list<std::string> l;
     std::string s;
 
-    std::for_each(str.begin(), str.end(), [&](const char &c)
+    std::for_each(str.begin(), str.end(), [&](const char& c)
     {
         if(c == delimiter)
         {
@@ -41,13 +41,13 @@ std::list<std::string> string_extensions::split(const std::string &str, const ch
     return l;
 }
 
-std::string string_extensions::remove_all(const std::string &str, const char &ch)
+std::string string_extensions::remove_all(const std::string& str, const char& ch)
 {
     std::string s;
 
     std::for_each(str.begin(), str.end(), [&](char c)
     {
-        if (c != ch)
+        if(c != ch)
             s += c;
     });
     return s;

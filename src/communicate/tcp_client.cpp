@@ -6,6 +6,7 @@
  *   licensed by GPL v3.0
  */
 
+#include "../business_logic/business_logic.h"
 #include "tcp_client.h"
 
 namespace communicate
@@ -22,9 +23,9 @@ tcp_client::tcp_client(uint server_addres, ushort server_port) : communicator(PF
     address.sin_port = htons(server_port);
 }
 
-void tcp_client::start(bool &stop)
+void tcp_client::start(bool& stop)
 {
-    if (-1 == connect(file_descriptor, reinterpret_cast<struct sockaddr*>(&address), sizeof(struct sockaddr_in)))
+    if(-1 == connect(file_descriptor, reinterpret_cast<struct sockaddr*>(&address), sizeof(struct sockaddr_in)))
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);
 
     stopped = false;
@@ -33,29 +34,21 @@ void tcp_client::start(bool &stop)
 
     try
     {
-        while (!stop)
+        while(!stop)
         {
-            std::string str;
-
-            std::getline(std::cin, str);
-
-            if(str == "stop")
-            {
-                stop = true;
-                break;
-            }
-
-            send(file_descriptor, str, address);
-
-            std::cout << receive(file_descriptor, sender_address) << std::endl;
+            buffer b;
+            business_logic::business_logic::input(b);
+            send(file_descriptor, b, address);
+            ssize_t number_of_bytes_resived = receive(file_descriptor, b, sender_address);
+            business_logic::business_logic::output(b, number_of_bytes_resived);
         }
 
-        if (-1 == shutdown(file_descriptor, SHUT_RDWR))
-            throw std::runtime_error(ERROR_STRING_BY_ERRNO);
+        if(-1 == shutdown(file_descriptor, SHUT_RDWR))
+            std::cerr << ERROR_STRING_BY_ERRNO << std::endl;
 
         stopped = true;
     }
-    catch (...)
+    catch(...)
     {
         stopped = true;
         throw ;

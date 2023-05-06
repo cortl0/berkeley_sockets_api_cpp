@@ -17,10 +17,10 @@ namespace communicate
 class udp_server final : public communicator
 {
 public:
-    virtual ~udp_server() override;
+    ~udp_server() final;
     explicit udp_server(ushort port);
     bool get_stopped();
-    virtual void start(bool &stop) final;
+    void start(bool& stop) final;
 };
 
 }

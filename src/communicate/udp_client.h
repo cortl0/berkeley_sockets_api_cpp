@@ -17,9 +17,9 @@ namespace communicate
 class udp_client final : public communicator
 {
 public:
-    virtual ~udp_client() override;
+    ~udp_client() final;
     explicit udp_client(uint server_addres, ushort server_port);
-    virtual void start(bool &stop) final;
+    void start(bool& stop) final;
 };
 
 }

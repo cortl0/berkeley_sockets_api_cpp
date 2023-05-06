@@ -6,6 +6,7 @@
  *   licensed by GPL v3.0
  */
 
+#include "../business_logic/business_logic.h"
 #include "udp_client.h"
 
 namespace communicate
@@ -22,7 +23,7 @@ udp_client::udp_client(uint server_addres, ushort server_port) : communicator(PF
     address.sin_port = htons(server_port);
 }
 
-void udp_client::start(bool &stop)
+void udp_client::start(bool& stop)
 {
     struct sockaddr_in sender_address;
 
@@ -30,26 +31,18 @@ void udp_client::start(bool &stop)
 
     try
     {
-        while (!stop)
+        while(!stop)
         {
-            std::string str;
-
-            std::getline(std::cin, str);
-
-            if(str == "stop")
-            {
-                stop = true;
-                break;
-            }
-
-            send(file_descriptor, str, address);
-
-            std::cout << receive(file_descriptor, sender_address) << std::endl;
+            buffer b;
+            business_logic::business_logic::input(b);
+            send(file_descriptor, b, address);
+            ssize_t number_of_bytes_resived = receive(file_descriptor, b, sender_address);
+            business_logic::business_logic::output(b, number_of_bytes_resived);
         }
 
         stopped = true;
     }
-    catch (...)
+    catch(...)
     {
         stopped = true;
         throw ;

@@ -30,23 +30,23 @@ bool tcp_server::get_stopped()
     return stopped;
 }
 
-void tcp_server::start(bool &stop)
+void tcp_server::start(bool& stop)
 {
-    if (-1 == bind(file_descriptor, reinterpret_cast<struct sockaddr*>(&address), sizeof(struct sockaddr)))
+    if(-1 == bind(file_descriptor, reinterpret_cast<struct sockaddr*>(&address), sizeof(struct sockaddr)))
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);
 
-    if (-1 == listen(file_descriptor, 10))
+    if(-1 == listen(file_descriptor, 10))
         throw std::runtime_error(ERROR_STRING_BY_ERRNO);
 
     stopped = false;
 
     try
     {
-        while (!stop)
+        while(!stop)
         {
             int connect_file_descriptor = accept(file_descriptor, nullptr, nullptr);
 
-            if (-1 == connect_file_descriptor)
+            if(-1 == connect_file_descriptor)
                 throw std::runtime_error(ERROR_STRING_BY_ERRNO);
 
             if(stop)
@@ -65,31 +65,23 @@ void tcp_server::start(bool &stop)
                 try
                 {
                     int connect_file_descriptor_ = connect_file_descriptor;
-
                     ok = true;
-
                     struct sockaddr_in address;
 
-                    while (!stop)
+                    while(!stop)
                     {
-                        std::string str(receive(connect_file_descriptor_, address));
+                        buffer b;
+                        receive(connect_file_descriptor_, b, address);
 
-                        if(str.size() == 0)
+                        if(!business_logic::business_logic::calculate(b, 0))
                             continue;
 
-                        std::cout << "tcp <<< " << str << std::endl;
-
-                        str = business_logic::business_logic::calculate(str);
-
-                        send(connect_file_descriptor_, str, address);
-
-                        std::cout << "tcp >>> " << str << std::endl;
+                        send(connect_file_descriptor_, b, address);
                     }
 
                     shutdown(connect_file_descriptor_, SHUT_RDWR);
-
                     close(connect_file_descriptor_);
-                } catch (...) { }
+                } catch(...) { }
 
             }).detach();
 
@@ -99,7 +91,7 @@ void tcp_server::start(bool &stop)
 
         stopped = true;
     }
-    catch (...)
+    catch(...)
     {
         stopped = true;
         throw ;

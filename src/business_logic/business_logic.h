@@ -11,13 +11,17 @@
 
 #include <string>
 
+#include "../communicate/buffer.h"
+
 namespace business_logic
 {
 
 class business_logic
 {
 public:
-    static std::string calculate(const std::string &);
+    static bool calculate(communicate::buffer&, int type);
+    static void input(communicate::buffer&);
+    static void output(const communicate::buffer&, ssize_t number_of_bytes_resived);
 };
 
 }
