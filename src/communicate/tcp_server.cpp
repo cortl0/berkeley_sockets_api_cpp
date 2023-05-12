@@ -6,10 +6,9 @@
  *   licensed by GPL v3.0
  */
 
-#include <thread>
-
 #include "tcp_server.h"
-#include "../business_logic/business_logic.h"
+
+#include <thread>
 
 namespace communicate
 {
@@ -19,89 +18,85 @@ tcp_server::~tcp_server()
 
 }
 
-tcp_server::tcp_server(ushort port) : communicator(PF_INET, SOCK_STREAM, IPPROTO_TCP)
+bool tcp_server::initialize(ushort port)
 {
-    address.sin_addr.s_addr = htonl(INADDR_ANY);
-    address.sin_port = htons(port);
-}
+    if(!communicator_.initialize(PF_INET, SOCK_STREAM, IPPROTO_TCP))
+        return false;
 
-bool tcp_server::get_stopped()
-{
-    return stopped;
+    communicator_.address.sin_addr.s_addr = htonl(INADDR_ANY);
+    communicator_.address.sin_port = htons(port);
+
+    if(-1 == bind(communicator_.file_descriptor, reinterpret_cast<struct sockaddr*>(&communicator_.address), sizeof(struct sockaddr)))
+        return false;
+
+    if(-1 == listen(communicator_.file_descriptor, 10))
+        return false;
+
+    return true;
 }
 
 void tcp_server::start(bool& stop)
 {
-    if(-1 == bind(file_descriptor, reinterpret_cast<struct sockaddr*>(&address), sizeof(struct sockaddr)))
-        throw std::runtime_error(ERROR_STRING_BY_ERRNO);
+    using namespace std::chrono_literals;
 
-    if(-1 == listen(file_descriptor, 10))
-        throw std::runtime_error(ERROR_STRING_BY_ERRNO);
+    communicator_.stopped = false;
 
-    stopped = false;
-
-    try
+    while(!stop)
     {
-        while(!stop)
+        int connect_file_descriptor = accept(communicator_.file_descriptor, nullptr, nullptr);
+
+        if(-1 == connect_file_descriptor)
+            throw std::runtime_error(ERROR_STRING_BY_ERRNO);
+
+        if(stop)
         {
-            int connect_file_descriptor = accept(file_descriptor, nullptr, nullptr);
+            shutdown(connect_file_descriptor, SHUT_RDWR);
 
-            if(-1 == connect_file_descriptor)
-                throw std::runtime_error(ERROR_STRING_BY_ERRNO);
+            close(connect_file_descriptor);
 
-            if(stop)
-            {
-                shutdown(connect_file_descriptor, SHUT_RDWR);
-
-                close(connect_file_descriptor);
-
-                break;
-            }
-
-            bool ok = false;
-
-            std::thread([&]()
-            {
-                try
-                {
-                    int connect_file_descriptor_ = connect_file_descriptor;
-                    ok = true;
-                    struct sockaddr_in address;
-
-                    while(!stop)
-                    {
-                        buffer b;
-                        ssize_t number_of_bytes = receive(connect_file_descriptor_, b, address);
-
-                        if(-1 == number_of_bytes)
-                            break;
-
-                        if(!business_logic::business_logic::calculate(b, 0))
-                            continue;
-
-                        number_of_bytes = send(connect_file_descriptor_, b, address);
-
-                        if(-1 == number_of_bytes)
-                            break;
-                    }
-
-                    shutdown(connect_file_descriptor_, SHUT_RDWR);
-                    close(connect_file_descriptor_);
-                } catch(...) { }
-
-            }).detach();
-
-            while(!ok)
-                usleep(10);
+            break;
         }
 
-        stopped = true;
+        bool ok = false;
+
+        std::thread([&]()
+        {
+            try
+            {
+                int connect_file_descriptor_ = connect_file_descriptor;
+                ok = true;
+                struct sockaddr_in address;
+
+                while(!stop)
+                {
+                    buffer b;
+                    ssize_t number_of_bytes = communicator_.receive(connect_file_descriptor_, b, address);
+
+                    if(-1 == number_of_bytes)
+                        break;
+
+                    if(0 < number_of_bytes)
+                        std::cout << "count of bytes received: " << b.size << std::endl;
+                    else
+                        std::this_thread::sleep_for(10ms);
+
+                    number_of_bytes = communicator_.send(connect_file_descriptor_, b, address);
+
+                    if(-1 == number_of_bytes)
+                        break;
+                }
+
+                shutdown(connect_file_descriptor_, SHUT_RDWR);
+                close(connect_file_descriptor_);
+            } catch(...) { }
+
+        }).detach();
+
+        while(!ok)
+            usleep(10);
     }
-    catch(...)
-    {
-        stopped = true;
-        throw ;
-    }
+
+    communicator_.stopped = true;
 }
 
-}
+} // namespace communicate

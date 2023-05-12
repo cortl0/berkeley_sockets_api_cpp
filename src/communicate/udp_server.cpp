@@ -7,7 +7,6 @@
  */
 
 #include "udp_server.h"
-#include "../business_logic/business_logic.h"
 
 namespace communicate
 {
@@ -17,55 +16,38 @@ udp_server::~udp_server()
 
 }
 
-udp_server::udp_server(ushort port) : communicator(PF_INET, SOCK_DGRAM, IPPROTO_UDP)
+bool udp_server::initialize(ushort port)
 {
-    address.sin_addr.s_addr = htonl(INADDR_ANY);
-    address.sin_port = htons(port);
-}
+    if(!communicator_.initialize(PF_INET, SOCK_DGRAM, IPPROTO_UDP))
+        return false;
 
-bool udp_server::get_stopped()
-{
-    return stopped;
+    communicator_.address.sin_addr.s_addr = htonl(INADDR_ANY);
+    communicator_.address.sin_port = htons(port);
+
+    if(-1 == bind(communicator_.file_descriptor, reinterpret_cast<struct sockaddr*>(&communicator_.address), sizeof(struct sockaddr)))
+        return false;
+
+    return true;
 }
 
 void udp_server::start(bool& stop)
 {
-    if(-1 == bind(file_descriptor, reinterpret_cast<struct sockaddr*>(&address), sizeof(struct sockaddr)))
-        throw std::runtime_error(ERROR_STRING_BY_ERRNO);
+    struct sockaddr_in address;
+    ssize_t number_of_bytes = 0;
+    buffer b;
 
-    stopped = false;
-
-    try
+    do
     {
-        while(!stop)
-        {
-            struct sockaddr_in address;
-            buffer b;
-            ssize_t number_of_bytes = receive(file_descriptor, b, address);
+        number_of_bytes = communicator_.receive(communicator_.file_descriptor, b, address);
 
-            if(-1 == number_of_bytes)
-                break;
+        if(-1 == number_of_bytes)
+            continue;
 
-            if(!business_logic::business_logic::calculate(b, 1))
-                continue;
+        std::cout << "count of bytes received: " << b.size << std::endl;
 
-            try
-            {
-                struct sockaddr_in address_ = address;
-                number_of_bytes = send(file_descriptor, b, address_);
-
-                if(-1 == number_of_bytes)
-                    break;
-            } catch(...) { }
-        }
-
-        stopped = true;
+        number_of_bytes = communicator_.send(communicator_.file_descriptor, b, address);
     }
-    catch(...)
-    {
-        stopped = true;
-        throw ;
-    }
+    while(number_of_bytes != -1);
 }
 
-}
+} // namespace communicate

@@ -29,21 +29,20 @@ namespace communicate
 
 class communicator
 {
-protected:
+public:
+    virtual ~communicator();
+    bool initialize(int domain, int type, int protocol);
+    bool is_stopped();
+    virtual void start(bool& stop) {}//= 0;
+
+//protected:
     int file_descriptor;
     bool stopped = true;
     struct sockaddr_in address;
-
     ssize_t receive(int file_descriptor, buffer&, sockaddr_in&) const;
     ssize_t send(int file_descriptor, const buffer&, const sockaddr_in&) const;
-
-public:
-    virtual ~communicator();
-    explicit communicator(int domain, int type, int protocol);
-    bool is_stopped();
-    virtual void start(bool& stop) = 0;
 };
 
-}
+} // namespace communicate
 
 #endif // COMMUNICATE_COMMUNICATOR_H

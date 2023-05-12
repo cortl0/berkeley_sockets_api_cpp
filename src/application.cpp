@@ -6,13 +6,15 @@
  *   licensed by GPL v3.0
  */
 
+#include "application.h"
+
 #include <algorithm>
 #include <list>
 #include <thread>
 #include <string.h>
 #include <unistd.h>
 
-#include "application.h"
+#include "communicate/buffer_tools.h"
 
 #include "communicate/udp_client.h"
 #include "communicate/udp_server.h"
@@ -23,31 +25,16 @@ static bool stop = false;
 
 static std::list<std::shared_ptr<communicate::communicator>> communicators;
 
-void try_catch_wrapper(void (*action)())
-{
-    try
-    {
-        action();
-    }
-    catch(const std::runtime_error& e)
-    {
-        std::cerr << "error: " << e.what() << std::endl;
-    }
-    catch(...)
-    {
-        std::cerr << "unknown error" << std::endl;
-    }
-}
-
 void usage()
 {
     std::cout << "Usage:" << std::endl << std::endl;
     std::cout << "\tberkeley_sockets [key]" << std::endl << std::endl;
     std::cout << "\tKeys:" << std::endl;
-    std::cout << "\t\t--help         - this help" << std::endl;
-    std::cout << "\t\ttcp            - run TCP client" << std::endl;
-    std::cout << "\t\tudp            - run UDP client" << std::endl;
-    std::cout << "\t\twithout key    - run TCP/UDP server" << std::endl << std::endl;
+    std::cout << "\t\thelp                 - this help" << std::endl;
+    std::cout << "\t\ttcp server           - run TCP server" << std::endl;
+    std::cout << "\t\ttcp client <message> - run TCP client and send message" << std::endl;
+    std::cout << "\t\tudp server           - run UDP server" << std::endl;
+    std::cout << "\t\tudp client <message> - run UDP client and send message" << std::endl;
 }
 
 application::~application()
@@ -60,74 +47,34 @@ application::~application()
 
 void application::run(int argc, char *argv[])
 {
-    switch(argc)
+    if(0 == strcmp(argv[1], "udp"))
     {
-    case 1:
-    {
-        std::cout << "server start" << std::endl;
-
-        std::thread([&]()
+        if(0 == strcmp(argv[2], "client"))
         {
-            try_catch_wrapper([]()
-            {
-                communicators.push_back(
-                            std::shared_ptr<communicate::communicator>(
-                                new communicate::udp_server(UDP_SERVER_PORT)));
+            communicate::udp_client udp_client;
 
-                communicators.back()->start(stop);
-            });
-        }).detach();
+            if(!udp_client.initialize(LOCALHOST_ADDRESS, UDP_SERVER_PORT))
+                return;
 
-        std::thread([&]()
-        {
-            try_catch_wrapper([]()
-            {
-                communicators.push_back(
-                            std::shared_ptr<communicate::communicator>(
-                                new communicate::tcp_server(TCP_SERVER_PORT)));
-
-                communicators.back()->start(stop);
-            });
-        }).detach();
-
-        std::cin >> argc;
-
-        stop = true;
-
-        break;
-    }
-
-    case 2:
-    {
-        if(0 == strcmp(argv[1], "udp"))
-        {
-            std::cout << "udp client start" << std::endl;
-
-            try_catch_wrapper([]()
-            {
-                communicators.push_back(
-                            std::shared_ptr<communicate::communicator>(
-                                new communicate::udp_client(LOCALHOST_ADDRESS, UDP_SERVER_PORT)));
-
-                communicators.back()->start(stop);
-            });
+            communicate::buffer b;
+            auto s = std::string(argv[3]);
+            communicate::buffer_set(b, s);
+            udp_client.send(b);
         }
-        else if(0 == strcmp(argv[1], "tcp"))
+        else if(0 == strcmp(argv[2], "server"))
         {
-            std::cout << "tcp client start" << std::endl;
-
-            try_catch_wrapper([]()
+            std::thread([&]()
             {
-                communicators.push_back(
-                            std::shared_ptr<communicate::communicator>(
-                                new communicate::tcp_client(LOCALHOST_ADDRESS, TCP_SERVER_PORT)));
+                communicate::udp_server udp_server;
 
-                communicators.back()->start(stop);
-            });
-        }
-        else if(0 == strcmp(argv[1], "--help"))
-        {
-            usage();
+                if(!udp_server.initialize(UDP_SERVER_PORT))
+                    return;
+
+                udp_server.start(stop);
+            }).detach();
+
+            std::cin >> argc;
+            stop = true;
         }
         else
         {
@@ -135,20 +82,51 @@ void application::run(int argc, char *argv[])
 
             usage();
         }
-
-        break;
     }
-
-    default:
+    else if(0 == strcmp(argv[1], "tcp"))
     {
-        std::cerr << "error: " << "wrong argc" + WHERE_ERROR << std::endl;
+        if(0 == strcmp(argv[2], "client"))
+        {
+            communicate::tcp_client tcp_client;
+
+            if(!tcp_client.initialize(LOCALHOST_ADDRESS, TCP_SERVER_PORT))
+                return;
+
+            communicate::buffer b;
+            auto s = std::string(argv[3]);
+            communicate::buffer_set(b, s);
+            tcp_client.send(b);
+        }
+        else if(0 == strcmp(argv[2], "server"))
+        {
+            std::thread([&]()
+            {
+                communicate::tcp_server tcp_server;
+
+                if(!tcp_server.initialize(TCP_SERVER_PORT))
+                    return;
+
+                tcp_server.start(stop);
+            }).detach();
+
+            std::cin >> argc;
+            stop = true;
+        }
+        else
+        {
+            std::cerr << "error: " << "wrong argv" + WHERE_ERROR << std::endl;
+
+            usage();
+        }
+    }
+    else if(0 == strcmp(argv[1], "help"))
+    {
+        usage();
+    }
+    else
+    {
+        std::cerr << "error: " << "wrong argv" + WHERE_ERROR << std::endl;
 
         usage();
-
-        break;
-    }
     }
 }
-
-
-

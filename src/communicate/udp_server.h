@@ -6,23 +6,25 @@
  *   licensed by GPL v3.0
  */
 
-#ifndef UDP_SERVER_H
-#define UDP_SERVER_H
+#ifndef COMMUNICATE_UDP_SERVER_H
+#define COMMUNICATE_UDP_SERVER_H
 
 #include "communicator.h"
 
 namespace communicate
 {
 
-class udp_server final : public communicator
+class udp_server
 {
 public:
-    ~udp_server() final;
-    explicit udp_server(ushort port);
-    bool get_stopped();
-    void start(bool& stop) final;
+    ~udp_server();
+    bool initialize(ushort port);
+    void start(bool& stop);
+
+private:
+    communicator communicator_;
 };
 
-}
+} // namespace communicate
 
-#endif // UDP_SERVER_H
+#endif // COMMUNICATE_UDP_SERVER_H

@@ -18,8 +18,7 @@ set(SOURCE
 	communicate/tcp_server.cpp
 	communicate/udp_client.cpp
 	communicate/udp_server.cpp
-	business_logic/business_logic.cpp
-	business_logic/string_extensions.cpp)
+)
 
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCE})
 

@@ -1,26 +1,25 @@
+/**
+ *   berkeley_sockets
+ *   created by Ilya Shishkin
+ *   cortl@8iter.ru
+ *   https://github.com/cortl0/berkeley_sockets
+ *   licensed by GPL v3.0
+ */
+
 #ifndef COMMUNICATE_BUFFER_H
 #define COMMUNICATE_BUFFER_H
 
 #include <sys/types.h>
 
-#define COMMUNICATOR_BUFFER_SIZE 1024
-
 namespace communicate
 {
 
+constexpr ssize_t buffer_size{1 << 16};
+
 struct buffer
 {
-    buffer()
-    {
-        size = COMMUNICATOR_BUFFER_SIZE;
-        data = data_internal;
-    }
-
-    void* data;
-    size_t size;
-
-private:
-    char data_internal[COMMUNICATOR_BUFFER_SIZE];
+    char data[buffer_size];
+    size_t size{0};
 };
 
 } // namespace communicate

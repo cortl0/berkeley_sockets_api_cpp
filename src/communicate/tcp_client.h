@@ -6,22 +6,25 @@
  *   licensed by GPL v3.0
  */
 
-#ifndef TCP_CLIENT_H
-#define TCP_CLIENT_H
+#ifndef COMMUNICATE_TCP_CLIENT_H
+#define COMMUNICATE_TCP_CLIENT_H
 
 #include "communicator.h"
 
 namespace communicate
 {
 
-class tcp_client final : public communicator
+class tcp_client
 {
 public:
-    ~tcp_client() final;
-    explicit tcp_client(uint server_addres, ushort server_port);
-    void start(bool& stop) final;
+    ~tcp_client();
+    bool initialize(uint server_addres, ushort server_port);
+    void send(buffer& b);
+
+private:
+    communicator communicator_;
 };
 
-}
+} // namespace communicate
 
-#endif // TCP_CLIENT_H
+#endif // COMMUNICATE_TCP_CLIENT_H
