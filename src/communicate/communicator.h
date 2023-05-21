@@ -18,8 +18,6 @@
 #include "buffer.h"
 
 #define LOCALHOST_ADDRESS 0x7F000001
-#define TCP_SERVER_PORT 5005
-#define UDP_SERVER_PORT 41797
 
 #define WHERE_ERROR (" at function: " + std::string(__FUNCTION__) + ", file: " + __FILE__ + ", line: " + std::to_string(__LINE__))
 #define ERROR_STRING_BY_ERRNO (std::string(strerror(errno)) + WHERE_ERROR)

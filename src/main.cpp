@@ -6,26 +6,57 @@
  *   licensed by GPL v3.0
  */
 
-#include <iostream>
+#include <thread>
 
-#include "application.h"
+#include "unit_tests/common.h"
+#include "config.h"
+#include "communicate/buffer.h"
 
-int main(int argc, char *argv[])
+#include "communicate/udp_client.h"
+#include "communicate/udp_server.h"
+#include "communicate/tcp_client.h"
+#include "communicate/tcp_server.h"
+
+int main()
 {
-    try
+    const auto s = std::string("12345");
+
     {
-        application app;
-        app.run(argc, argv);
+        communicate::buffer b;
+        b.buffer_set(b, s);
+        bool stop{false};
+        communicate::udp_server udp_server;
+        communicate::udp_client udp_client;
+        ASSERT_TRUE(udp_server.initialize(config.udp_server_port));
+
+        std::thread([&]()
+        {
+            udp_server.start(stop);
+        }).detach();
+
+        ASSERT_TRUE(udp_client.initialize(LOCALHOST_ADDRESS, config.udp_server_port));
+        udp_client.send(b);
     }
-    catch(const std::runtime_error& e)
+
     {
-        std::cerr << "error: " << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
-    catch(...)
-    {
-        std::cerr << "unknown error" << std::endl;
-        return EXIT_FAILURE;
+        communicate::buffer b;
+        b.buffer_set(b, s);
+        bool stop{false};
+
+        communicate::tcp_server tcp_server;
+        communicate::tcp_client tcp_client;
+        ASSERT_TRUE(tcp_server.initialize(config.tcp_server_port));
+
+        std::thread([&]()
+        {
+            tcp_server.start(stop);
+        }).detach();
+
+        ASSERT_TRUE(tcp_client.initialize(LOCALHOST_ADDRESS, config.tcp_server_port));
+        tcp_client.send(b);
+
+        std::string ss;
+        std::cin >> ss;
     }
 
     return EXIT_SUCCESS;
