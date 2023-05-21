@@ -9,7 +9,7 @@
 #ifndef COMMUNICATE_UDP_SERVER_H
 #define COMMUNICATE_UDP_SERVER_H
 
-#include "communicator.h"
+#include "communicate/communicator.h"
 
 namespace communicate
 {

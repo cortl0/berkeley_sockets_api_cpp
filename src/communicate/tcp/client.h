@@ -9,7 +9,7 @@
 #ifndef COMMUNICATE_TCP_CLIENT_H
 #define COMMUNICATE_TCP_CLIENT_H
 
-#include "communicator.h"
+#include "communicate/communicator.h"
 
 namespace communicate
 {

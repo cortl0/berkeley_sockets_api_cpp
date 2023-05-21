@@ -10,6 +10,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(berkeley_sockets)
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 set(SOURCE
 	communicate/communicator.cpp
 	communicate/tcp/client.cpp

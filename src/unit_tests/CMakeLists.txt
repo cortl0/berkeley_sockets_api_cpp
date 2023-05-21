@@ -11,21 +11,16 @@ cmake_minimum_required(VERSION 3.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(.. .)
+include_directories(..)
 include(CTest)
 enable_testing()
 
 set(BERKELEY_SOCKETS_TEST_BIN_NAME berkeley_sockets_test)
 
 set(SOURCES
-    ../main.cpp
-    ../communicate/communicator.cpp
-	../communicate/tcp/client.cpp
-	../communicate/tcp/server.cpp
-	../communicate/udp/client.cpp
-	../communicate/udp/server.cpp
+    udp_test.cpp
     )
 
 add_executable(${BERKELEY_SOCKETS_TEST_BIN_NAME} ${SOURCES})
-target_link_libraries(${BERKELEY_SOCKETS_TEST_BIN_NAME} pthread)
+target_link_libraries(${BERKELEY_SOCKETS_TEST_BIN_NAME} pthread berkeley_sockets)
 add_test(NAME ${BERKELEY_SOCKETS_TEST_BIN_NAME} COMMAND ${BERKELEY_SOCKETS_TEST_BIN_NAME})

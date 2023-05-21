@@ -6,7 +6,7 @@
  *   licensed by GPL v3.0
  */
 
-#include "tcp_server.h"
+#include "communicate/tcp/server.h"
 
 #include <thread>
 

@@ -6,7 +6,7 @@
  *   licensed by GPL v3.0
  */
 
-#include "udp_client.h"
+#include "communicate/udp/client.h"
 
 namespace communicate
 {

@@ -6,7 +6,7 @@
  *   licensed by GPL v3.0
  */
 
-#include "tcp_client.h"
+#include "communicate/tcp/client.h"
 
 namespace communicate
 {
