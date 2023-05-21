@@ -12,10 +12,10 @@ project(berkeley_sockets)
 
 set(SOURCE
 	communicate/communicator.cpp
-	communicate/tcp_client.cpp
-	communicate/tcp_server.cpp
-	communicate/udp_client.cpp
-	communicate/udp_server.cpp
+	communicate/tcp/client.cpp
+	communicate/tcp/server.cpp
+	communicate/udp/client.cpp
+	communicate/udp/server.cpp
 )
 
 add_library(${CMAKE_PROJECT_NAME} ${SOURCE})

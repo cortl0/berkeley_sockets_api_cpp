@@ -12,10 +12,10 @@
 #include "config.h"
 #include "communicate/buffer.h"
 
-#include "communicate/udp_client.h"
-#include "communicate/udp_server.h"
-#include "communicate/tcp_client.h"
-#include "communicate/tcp_server.h"
+#include "communicate/udp/client.h"
+#include "communicate/udp/server.h"
+#include "communicate/tcp/client.h"
+#include "communicate/tcp/server.h"
 
 int main()
 {

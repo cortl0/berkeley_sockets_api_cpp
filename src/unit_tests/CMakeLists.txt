@@ -20,10 +20,10 @@ set(BERKELEY_SOCKETS_TEST_BIN_NAME berkeley_sockets_test)
 set(SOURCES
     ../main.cpp
     ../communicate/communicator.cpp
-	../communicate/tcp_client.cpp
-	../communicate/tcp_server.cpp
-	../communicate/udp_client.cpp
-	../communicate/udp_server.cpp
+	../communicate/tcp/client.cpp
+	../communicate/tcp/server.cpp
+	../communicate/udp/client.cpp
+	../communicate/udp/server.cpp
     )
 
 add_executable(${BERKELEY_SOCKETS_TEST_BIN_NAME} ${SOURCES})
