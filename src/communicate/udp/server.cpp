@@ -8,15 +8,15 @@
 
 #include "communicate/udp/server.h"
 
-namespace communicate
+namespace communicate::udp
 {
 
-udp_server::~udp_server()
+server::~server()
 {
 
 }
 
-bool udp_server::initialize(ushort port)
+bool server::initialize(ushort port)
 {
     if(!communicator_.initialize(PF_INET, SOCK_DGRAM, IPPROTO_UDP))
         return false;
@@ -30,7 +30,7 @@ bool udp_server::initialize(ushort port)
     return true;
 }
 
-void udp_server::start(bool& stop)
+void server::start(bool& stop)
 {
     struct sockaddr_in address;
     ssize_t number_of_bytes = 0;
@@ -50,4 +50,4 @@ void udp_server::start(bool& stop)
     while(number_of_bytes != -1);
 }
 
-} // namespace communicate
+} // namespace communicate::udp

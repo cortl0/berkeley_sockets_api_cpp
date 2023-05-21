@@ -8,15 +8,15 @@
 
 #include "communicate/udp/client.h"
 
-namespace communicate
+namespace communicate::udp
 {
 
-udp_client::~udp_client()
+client::~client()
 {
 
 }
 
-bool udp_client::initialize(uint server_addres, ushort server_port)
+bool client::initialize(uint server_addres, ushort server_port)
 {
     if(!communicator_.initialize(PF_INET, SOCK_DGRAM, IPPROTO_UDP))
         return false;
@@ -27,7 +27,7 @@ bool udp_client::initialize(uint server_addres, ushort server_port)
     return true;
 }
 
-int udp_client::send(/*sockaddr_in& address,*/ buffer& b)
+int client::send(/*sockaddr_in& address,*/ buffer& b)
 {
     ssize_t number_of_bytes = communicator_.send(communicator_.file_descriptor, b, communicator_.address);
 
@@ -39,4 +39,4 @@ int udp_client::send(/*sockaddr_in& address,*/ buffer& b)
     return number_of_bytes;
 }
 
-} // namespace communicate
+} // namespace communicate::udp

@@ -11,13 +11,13 @@
 
 #include "communicate/communicator.h"
 
-namespace communicate
+namespace communicate::tcp
 {
 
-class tcp_client
+class client
 {
 public:
-    ~tcp_client();
+    ~client();
     bool initialize(uint server_addres, ushort server_port);
     void send(buffer& b);
 
@@ -25,6 +25,6 @@ private:
     communicator communicator_;
 };
 
-} // namespace communicate
+} // namespace communicate::tcp
 
 #endif // COMMUNICATE_TCP_CLIENT_H

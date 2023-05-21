@@ -8,15 +8,15 @@
 
 #include "communicate/tcp/client.h"
 
-namespace communicate
+namespace communicate::tcp
 {
 
-tcp_client::~tcp_client()
+client::~client()
 {
 
 }
 
-bool tcp_client::initialize(uint server_addres, ushort server_port)
+bool client::initialize(uint server_addres, ushort server_port)
 {
     if(!communicator_.initialize(PF_INET, SOCK_STREAM, IPPROTO_TCP))
         return false;
@@ -30,7 +30,7 @@ bool tcp_client::initialize(uint server_addres, ushort server_port)
     return true;
 }
 
-void tcp_client::send(buffer& b)
+void client::send(buffer& b)
 {
     communicator_.stopped = false;
     struct sockaddr_in sender_address;
@@ -43,4 +43,4 @@ void tcp_client::send(buffer& b)
     communicator_.stopped = true;
 }
 
-} // namespace communicate
+} // namespace communicate::tcp

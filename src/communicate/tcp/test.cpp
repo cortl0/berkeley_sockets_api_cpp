@@ -8,32 +8,31 @@
 
 #include <thread>
 
-#include "unit_tests/common.h"
-#include "config.h"
-#include "communicate/buffer.h"
-
 #include "communicate/tcp/client.h"
 #include "communicate/tcp/server.h"
+#include "unit_tests/common.h"
+
+constexpr uint localhost_address{0x7F000001};
+constexpr uint16_t server_port{60001};
 
 int main()
 {
     const auto s = std::string("12345");
-
     communicate::buffer b;
     b.buffer_set(b, s);
+
+    communicate::tcp::server server;
+    ASSERT_TRUE(server.initialize(server_port));
+
     bool stop{false};
-
-    communicate::tcp_server tcp_server;
-    communicate::tcp_client tcp_client;
-    ASSERT_TRUE(tcp_server.initialize(config.tcp_server_port));
-
     std::thread([&]()
     {
-        tcp_server.start(stop);
+        server.start(stop);
     }).detach();
 
-    ASSERT_TRUE(tcp_client.initialize(LOCALHOST_ADDRESS, config.tcp_server_port));
-    tcp_client.send(b);
+    communicate::tcp::client client;
+    ASSERT_TRUE(client.initialize(localhost_address, server_port));
+    client.send(b);
 
     std::string ss;
     std::cin >> ss;

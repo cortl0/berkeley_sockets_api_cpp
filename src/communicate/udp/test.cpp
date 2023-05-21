@@ -8,31 +8,31 @@
 
 #include <thread>
 
-#include "unit_tests/common.h"
-#include "config.h"
-#include "communicate/buffer.h"
-
 #include "communicate/udp/client.h"
 #include "communicate/udp/server.h"
+#include "unit_tests/common.h"
+
+constexpr uint localhost_address{0x7F000001};
+constexpr uint16_t server_port{60001};
 
 int main()
 {
     const auto s = std::string("12345");
-
     communicate::buffer b;
     b.buffer_set(b, s);
-    bool stop{false};
-    communicate::udp_server udp_server;
-    communicate::udp_client udp_client;
-    ASSERT_TRUE(udp_server.initialize(config.udp_server_port));
 
+    communicate::udp::server server;
+    ASSERT_TRUE(server.initialize(server_port));
+
+    bool stop{false};
     std::thread([&]()
     {
-        udp_server.start(stop);
+        server.start(stop);
     }).detach();
 
-    ASSERT_TRUE(udp_client.initialize(LOCALHOST_ADDRESS, config.udp_server_port));
-    udp_client.send(b);
+    communicate::udp::client client;
+    ASSERT_TRUE(client.initialize(localhost_address, server_port));
+    client.send(b);
 
     return EXIT_SUCCESS;
 }

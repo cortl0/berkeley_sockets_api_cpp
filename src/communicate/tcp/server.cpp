@@ -10,15 +10,15 @@
 
 #include <thread>
 
-namespace communicate
+namespace communicate::tcp
 {
 
-tcp_server::~tcp_server()
+server::~server()
 {
 
 }
 
-bool tcp_server::initialize(ushort port)
+bool server::initialize(ushort port)
 {
     if(!communicator_.initialize(PF_INET, SOCK_STREAM, IPPROTO_TCP))
         return false;
@@ -35,7 +35,7 @@ bool tcp_server::initialize(ushort port)
     return true;
 }
 
-void tcp_server::start(bool& stop)
+void server::start(bool& stop)
 {
     using namespace std::chrono_literals;
 
@@ -99,4 +99,4 @@ void tcp_server::start(bool& stop)
     communicator_.stopped = true;
 }
 
-} // namespace communicate
+} // namespace communicate::tcp

@@ -11,13 +11,13 @@
 
 #include "communicate/communicator.h"
 
-namespace communicate
+namespace communicate::udp
 {
 
-class udp_client
+class client
 {
 public:
-    ~udp_client();
+    ~client();
     bool initialize(uint server_addres, ushort server_port);
     int send(buffer& b);
 
@@ -25,6 +25,6 @@ private:
     communicator communicator_;
 };
 
-} // namespace communicate
+} // namespace communicate::udp
 
 #endif // COMMUNICATE_UDP_CLIENT_H
