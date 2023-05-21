@@ -12,8 +12,8 @@
 #include "config.h"
 #include "communicate/buffer.h"
 
-#include "communicate/udp/client.h"
-#include "communicate/udp/server.h"
+#include "communicate/tcp/client.h"
+#include "communicate/tcp/server.h"
 
 int main()
 {
@@ -22,17 +22,21 @@ int main()
     communicate::buffer b;
     b.buffer_set(b, s);
     bool stop{false};
-    communicate::udp_server udp_server;
-    communicate::udp_client udp_client;
-    ASSERT_TRUE(udp_server.initialize(config.udp_server_port));
+
+    communicate::tcp_server tcp_server;
+    communicate::tcp_client tcp_client;
+    ASSERT_TRUE(tcp_server.initialize(config.tcp_server_port));
 
     std::thread([&]()
     {
-        udp_server.start(stop);
+        tcp_server.start(stop);
     }).detach();
 
-    ASSERT_TRUE(udp_client.initialize(LOCALHOST_ADDRESS, config.udp_server_port));
-    udp_client.send(b);
+    ASSERT_TRUE(tcp_client.initialize(LOCALHOST_ADDRESS, config.tcp_server_port));
+    tcp_client.send(b);
+
+    std::string ss;
+    std::cin >> ss;
 
     return EXIT_SUCCESS;
 }

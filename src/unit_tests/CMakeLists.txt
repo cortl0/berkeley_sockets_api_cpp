@@ -15,12 +15,13 @@ include_directories(..)
 include(CTest)
 enable_testing()
 
-set(BERKELEY_SOCKETS_TEST_BIN_NAME berkeley_sockets_test)
+set(UDP_TEST_BIN_NAME berkeley_sockets_test)
+add_executable(${UDP_TEST_BIN_NAME} udp_test.cpp)
+target_link_libraries(${UDP_TEST_BIN_NAME} pthread berkeley_sockets)
+add_test(NAME ${UDP_TEST_BIN_NAME} COMMAND ${UDP_TEST_BIN_NAME})
 
-set(SOURCES
-    udp_test.cpp
-    )
 
-add_executable(${BERKELEY_SOCKETS_TEST_BIN_NAME} ${SOURCES})
-target_link_libraries(${BERKELEY_SOCKETS_TEST_BIN_NAME} pthread berkeley_sockets)
-add_test(NAME ${BERKELEY_SOCKETS_TEST_BIN_NAME} COMMAND ${BERKELEY_SOCKETS_TEST_BIN_NAME})
+set(TCP_TEST_BIN_NAME tcp_test)
+add_executable(${TCP_TEST_BIN_NAME} tcp_test.cpp)
+target_link_libraries(${TCP_TEST_BIN_NAME} pthread berkeley_sockets)
+add_test(NAME ${TCP_TEST_BIN_NAME} COMMAND ${TCP_TEST_BIN_NAME})
