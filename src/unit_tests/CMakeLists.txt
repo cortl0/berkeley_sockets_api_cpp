@@ -11,17 +11,17 @@ cmake_minimum_required(VERSION 3.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(..)
 include(CTest)
 enable_testing()
 
-set(UDP_TEST_BIN_NAME berkeley_sockets_test)
-add_executable(${UDP_TEST_BIN_NAME} udp_test.cpp)
+include_directories(${CMAKE_SOURCE_DIR})
+
+set(UDP_TEST_BIN_NAME udp_test)
+add_executable(${UDP_TEST_BIN_NAME} ${CMAKE_SOURCE_DIR}/communicate/udp/test.cpp)
 target_link_libraries(${UDP_TEST_BIN_NAME} pthread berkeley_sockets)
 add_test(NAME ${UDP_TEST_BIN_NAME} COMMAND ${UDP_TEST_BIN_NAME})
 
-
 set(TCP_TEST_BIN_NAME tcp_test)
-add_executable(${TCP_TEST_BIN_NAME} tcp_test.cpp)
+add_executable(${TCP_TEST_BIN_NAME} ${CMAKE_SOURCE_DIR}/communicate/tcp/test.cpp)
 target_link_libraries(${TCP_TEST_BIN_NAME} pthread berkeley_sockets)
 add_test(NAME ${TCP_TEST_BIN_NAME} COMMAND ${TCP_TEST_BIN_NAME})
