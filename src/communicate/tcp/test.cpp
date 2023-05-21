@@ -34,8 +34,9 @@ int main()
     ASSERT_TRUE(client.initialize(localhost_address, server_port));
     client.send(b);
 
-    std::string ss;
-    std::cin >> ss;
+    std::string stub("input anything");
+    std::cout << stub << std::endl;
+    std::cin >> stub;
 
     return EXIT_SUCCESS;
 }
