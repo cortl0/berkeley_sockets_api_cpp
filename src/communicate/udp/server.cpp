@@ -16,15 +16,11 @@ server::~server()
 
 }
 
-bool server::initialize(ushort port)
+bool server::initialize(address local, address remote)
 {
-    if(!communicator_.initialize(PF_INET, SOCK_DGRAM, IPPROTO_UDP))
-        return false;
+    printf("server:\n");
 
-    communicator_.address.sin_addr.s_addr = htonl(INADDR_ANY);
-    communicator_.address.sin_port = htons(port);
-
-    if(-1 == bind(communicator_.file_descriptor, reinterpret_cast<struct sockaddr*>(&communicator_.address), sizeof(struct sockaddr)))
+    if(!communicator_.initialize(SOCK_DGRAM, IPPROTO_UDP, local, remote))
         return false;
 
     return true;

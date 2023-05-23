@@ -18,7 +18,7 @@ class server
 {
 public:
     ~server();
-    bool initialize(ushort port);
+    bool initialize(address local, address remote);
     void start(bool& stop);
 
 private:

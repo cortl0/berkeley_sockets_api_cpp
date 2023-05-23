@@ -16,15 +16,14 @@ client::~client()
 
 }
 
-bool client::initialize(uint server_addres, ushort server_port)
+bool client::initialize(address local, address remote)
 {
-    if(!communicator_.initialize(PF_INET, SOCK_STREAM, IPPROTO_TCP))
+    printf("client:\n");
+
+    if(!communicator_.initialize(SOCK_STREAM, IPPROTO_TCP, local, remote))
         return false;
 
-    communicator_.address.sin_addr.s_addr = htonl(server_addres);
-    communicator_.address.sin_port = htons(server_port);
-
-    if(-1 == connect(communicator_.file_descriptor, reinterpret_cast<struct sockaddr*>(&communicator_.address), sizeof(struct sockaddr_in)))
+    if(-1 == connect(communicator_.file_descriptor, &remote.address_.sockaddr_, remote.length))
         return false;
 
     return true;
@@ -34,7 +33,20 @@ void client::send(buffer& b)
 {
     communicator_.stopped = false;
     struct sockaddr_in sender_address;
-    communicator_.send(communicator_.file_descriptor, b, communicator_.address);
+    communicator_.send(communicator_.file_descriptor, b, communicator_.address5);
+    ssize_t number_of_bytes = communicator_.receive(communicator_.file_descriptor, b, sender_address);
+
+    if(-1 == shutdown(communicator_.file_descriptor, SHUT_RDWR))
+        std::cerr << ERROR_STRING_BY_ERRNO << std::endl;
+
+    communicator_.stopped = true;
+}
+
+void client::send(buffer& b, address& a)
+{
+    communicator_.stopped = false;
+    struct sockaddr_in sender_address;
+    communicator_.send(communicator_.file_descriptor, b, a.address_.sockaddr_in_);
     ssize_t number_of_bytes = communicator_.receive(communicator_.file_descriptor, b, sender_address);
 
     if(-1 == shutdown(communicator_.file_descriptor, SHUT_RDWR))

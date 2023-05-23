@@ -16,20 +16,19 @@ client::~client()
 
 }
 
-bool client::initialize(uint server_addres, ushort server_port)
+bool client::initialize(address local, address remote)
 {
-    if(!communicator_.initialize(PF_INET, SOCK_DGRAM, IPPROTO_UDP))
-        return false;
+    printf("client:\n");
 
-    communicator_.address.sin_addr.s_addr = htonl(server_addres);
-    communicator_.address.sin_port = htons(server_port);
+    if(!communicator_.initialize(SOCK_DGRAM, IPPROTO_UDP, local, remote))
+        return false;
 
     return true;
 }
 
-int client::send(/*sockaddr_in& address,*/ buffer& b)
+int client::send(buffer& b, address& a)
 {
-    ssize_t number_of_bytes = communicator_.send(communicator_.file_descriptor, b, communicator_.address);
+    ssize_t number_of_bytes = communicator_.send(communicator_.file_descriptor, b, a.address_.sockaddr_in_);
 
     if(-1 == number_of_bytes)
         std::cerr << ERROR_STRING_BY_ERRNO << std::endl;

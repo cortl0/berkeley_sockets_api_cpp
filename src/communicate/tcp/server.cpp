@@ -18,19 +18,21 @@ server::~server()
 
 }
 
-bool server::initialize(ushort port)
+bool server::initialize(address local, address remote)
 {
-    if(!communicator_.initialize(PF_INET, SOCK_STREAM, IPPROTO_TCP))
+    printf("server:\n");
+
+    if(!communicator_.initialize(SOCK_STREAM, IPPROTO_TCP, local, remote))
         return false;
 
-    communicator_.address.sin_addr.s_addr = htonl(INADDR_ANY);
-    communicator_.address.sin_port = htons(port);
-
-    if(-1 == bind(communicator_.file_descriptor, reinterpret_cast<struct sockaddr*>(&communicator_.address), sizeof(struct sockaddr)))
+    if(-1 == bind(communicator_.file_descriptor, reinterpret_cast<struct sockaddr*>(&local), local.length))
         return false;
 
     if(-1 == listen(communicator_.file_descriptor, 10))
+    {
+        std::cerr << ERROR_STRING_BY_ERRNO << std::endl;
         return false;
+    }
 
     return true;
 }

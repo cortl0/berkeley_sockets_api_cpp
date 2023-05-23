@@ -18,8 +18,8 @@ class client
 {
 public:
     ~client();
-    bool initialize(uint server_addres, ushort server_port);
-    int send(buffer& b);
+    bool initialize(address local, address remote);
+    int send(buffer&, address&);
 
 private:
     communicator communicator_;

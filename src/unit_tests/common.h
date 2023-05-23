@@ -15,7 +15,7 @@
 using namespace std::string_literals;
 
 #define place_string std::string().append(std::string(__FUNCTION__)).append(": ").append(__FILE__).append(": ").append(std::to_string(__LINE__))
-#define log_string(msg) std::string().append(" | ").append(msg).append(" | at: ").append(place_string)
+#define log_string(msg) std::string().append(msg).append(" | at: ").append(place_string)
 #define logging(msg) std::cout << log_string(msg) << std::endl
 
 #define ASSERT_EQ(x, y)\

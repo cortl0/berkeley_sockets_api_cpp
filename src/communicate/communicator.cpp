@@ -20,10 +20,17 @@ communicator::~communicator()
     close(file_descriptor);
 }
 
-bool communicator::initialize(int domain, int type, int protocol)
+bool communicator::initialize(int type, int protocol, address local, address remote)
 {
-    address.sin_family = domain;
-    return -1 != (file_descriptor = socket(domain, type, protocol));
+    printf("local ");
+    local.print();
+    printf("remote ");
+    remote.print();
+
+    if(-1 == (file_descriptor = socket(local.address_.sockaddr_.sa_family, type, protocol)))
+        return false;
+
+    return true;
 }
 
 bool communicator::is_stopped()

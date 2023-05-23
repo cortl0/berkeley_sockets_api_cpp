@@ -27,6 +27,7 @@ public:
     {
         set_ip("0.0.0.0");
         set_port(0);
+        address_.sockaddr_.sa_family = PF_INET;
     }
 
     address(const address& a)
