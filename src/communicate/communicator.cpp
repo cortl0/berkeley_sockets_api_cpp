@@ -2,7 +2,7 @@
  *   berkeley_sockets
  *   created by Ilya Shishkin
  *   cortl@8iter.ru
- *   https://github.com/cortl0/berkeley_sockets
+ *   https://github.com/cortl0/berkeley_sockets_api_cpp
  *   licensed by GPL v3.0
  */
 
@@ -20,34 +20,34 @@ communicator::~communicator()
     close(file_descriptor);
 }
 
-bool communicator::initialize(int type, int protocol, address local, address remote)
+bool communicator::initialize(int type, int protocol)
 {
-    printf("local ");
-    local.print();
-    printf("remote ");
-    remote.print();
-
-    if(-1 == (file_descriptor = socket(local.address_.sockaddr_.sa_family, type, protocol)))
+    if(-1 == (file_descriptor = socket(PF_INET, type, protocol)))
+    {
+        log(ERROR_STRING_BY_ERRNO);
         return false;
+    }
 
     return true;
 }
 
-bool communicator::is_stopped()
+ssize_t communicator::receive(buffer& b) const
 {
-    return stopped;
+    return receive(file_descriptor, b);
 }
 
-ssize_t communicator::receive(int file_descriptor, buffer& b, sockaddr_in& address) const
+ssize_t communicator::receive(buffer& b, address& a) const
 {
-    socklen_t address_length = sizeof(struct sockaddr_in);
+    return receive(file_descriptor, b, a);
+}
 
-    ssize_t number_of_bytes = recvfrom(file_descriptor, b.data, buffer_size, 0,
-        reinterpret_cast<struct sockaddr*>(&address), &address_length);
+ssize_t communicator::receive(int file_descriptor, buffer& b) const
+{
+    ssize_t number_of_bytes = recv(file_descriptor, b.data, buffer_size, 0);
 
     if(-1 == number_of_bytes)
     {
-        std::cerr << ERROR_STRING_BY_ERRNO << std::endl;
+        log(ERROR_STRING_BY_ERRNO);
         b.size = 0;
     }
     else
@@ -58,13 +58,49 @@ ssize_t communicator::receive(int file_descriptor, buffer& b, sockaddr_in& addre
     return number_of_bytes;
 }
 
-ssize_t communicator::send(int file_descriptor, const buffer& b, const sockaddr_in& address) const
+ssize_t communicator::receive(int file_descriptor, buffer& b, address& a) const
 {
-    ssize_t number_of_bytes = sendto(file_descriptor, b.data, b.size, 0,
-        reinterpret_cast<const struct sockaddr*>(&address), sizeof(struct sockaddr_in));
+    ssize_t number_of_bytes = recvfrom(file_descriptor, b.data, buffer_size, 0, &a.address_.sockaddr_, &a.length);
 
     if(-1 == number_of_bytes)
-        std::cerr << ERROR_STRING_BY_ERRNO << std::endl;
+    {
+        log(ERROR_STRING_BY_ERRNO);
+        b.size = 0;
+    }
+    else
+    {
+        b.size = number_of_bytes;
+    }
+
+    return number_of_bytes;
+}
+
+ssize_t communicator::send(const buffer& b) const
+{
+    return send(file_descriptor, b);
+}
+
+ssize_t communicator::send(const buffer& b, const address& a) const
+{
+    return send(file_descriptor, b, a);
+}
+
+ssize_t communicator::send(int file_descriptor, const buffer& b) const
+{
+    ssize_t number_of_bytes = ::send(file_descriptor, b.data, (size_t)b.size, 0);
+
+    if(-1 == number_of_bytes)
+        log(ERROR_STRING_BY_ERRNO);
+
+    return number_of_bytes;
+}
+
+ssize_t communicator::send(int file_descriptor, const buffer& b, const address& a) const
+{
+    ssize_t number_of_bytes = sendto(file_descriptor, b.data, b.size, 0, &a.address_.sockaddr_, a.length);
+
+    if(-1 == number_of_bytes)
+        log(ERROR_STRING_BY_ERRNO);
 
     return number_of_bytes;
 }

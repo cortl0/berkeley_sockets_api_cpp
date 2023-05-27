@@ -2,7 +2,7 @@
  *   berkeley_sockets
  *   created by Ilya Shishkin
  *   cortl@8iter.ru
- *   https://github.com/cortl0/berkeley_sockets
+ *   https://github.com/cortl0/berkeley_sockets_api_cpp
  *   licensed by GPL v3.0
  */
 
@@ -10,11 +10,10 @@
 #define COMMUNICATE_COMMUNICATOR_H
 
 #include <netdb.h>
-#include <string.h>
+#include <string>
 #include <unistd.h>
 
 #include <functional>
-#include <iostream>
 
 #include "address.h"
 #include "buffer.h"
@@ -29,17 +28,19 @@ class communicator
 {
 public:
     virtual ~communicator();
-    bool initialize(int type, int protocol, address local, address remote);
-    bool is_stopped();
-    virtual void start(bool& stop) {}//= 0;
+    bool initialize(int type, int protocol);
+    ssize_t receive(buffer&) const;
+    ssize_t receive(buffer&, address&) const;
+    ssize_t receive(int file_descriptor, buffer&) const;
+    ssize_t receive(int file_descriptor, buffer&, address&) const;
+    ssize_t send(const buffer&) const;
+    ssize_t send(const buffer&, const address&) const;
+    ssize_t send(int file_descriptor, const buffer&) const;
+    ssize_t send(int file_descriptor, const buffer&, const address&) const;
 
 //protected:
     int file_descriptor;
-    bool stopped = true;
-    struct sockaddr_in address5;
-    ssize_t receive(int file_descriptor, buffer&, sockaddr_in&) const;
-    ssize_t send(int file_descriptor, const buffer&, const sockaddr_in&) const;
-    std::function<void(std::string&)> log = [](const std::string& s) { /*std::cout << s << std::endl;*/ };
+    std::function<void(const std::string&)> log{ [](const std::string& s){} };
 };
 
 } // namespace communicate

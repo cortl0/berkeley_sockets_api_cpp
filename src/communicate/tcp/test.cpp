@@ -2,7 +2,7 @@
  *   berkeley_sockets
  *   created by Ilya Shishkin
  *   cortl@8iter.ru
- *   https://github.com/cortl0/berkeley_sockets
+ *   https://github.com/cortl0/berkeley_sockets_api_cpp
  *   licensed by GPL v3.0
  */
 
@@ -12,42 +12,36 @@
 #include "communicate/tcp/server.h"
 #include "unit_tests/common.h"
 
-constexpr uint localhost_address{0x7F000001};
 constexpr uint16_t server_port{60001};
 constexpr uint16_t client_port{60002};
 
-int send_to_server()
+int tcp_test()
 {
-    const auto s = std::string("12345");
-    communicate::buffer b;
-    b.buffer_set(b, s);
-
     communicate::tcp::server server;
-    communicate::address local;
-    communicate::address remote;
-    local.set_ip("127.0.0.1");
-    local.set_port(server_port);
-    ASSERT_TRUE(server.initialize(local, remote));
-
     bool stop{false};
-    std::thread([&]()
-    {
-        server.start(stop);
-    }).detach();
 
     {
+        communicate::address server_local_address;
+        server_local_address.set_port(server_port);
+        ASSERT_TRUE(server.initialize(server_local_address));
+        std::thread([&](){ server.start(stop); }).detach();
+    }
+
+    {
+        const auto etalon = std::string("12345");
+        communicate::buffer first;
+        communicate::buffer second;
         communicate::tcp::client client;
-        communicate::address local;
-        communicate::address remote;
-        //local.set_port(client_port);
-        remote.set_ip("127.0.0.1");
-        remote.set_port(server_port);
-        ASSERT_TRUE(client.initialize(local, remote));
-        client.send(b, remote);
+        communicate::address client_remote_address;
+        communicate::address client_local_address;
+        client_remote_address.set_ip("127.0.0.1");
+        client_remote_address.set_port(server_port);
+        ASSERT_TRUE(client.initialize(client_local_address, client_remote_address));
+        first.buffer_set(first, etalon);
 
-        std::string stub("input anything");
-        std::cout << stub << std::endl;
-        std::cin >> stub;
+        ASSERT_TRUE(client.communicator_.send(first) > 0);
+        ASSERT_TRUE(client.communicator_.receive(second) > 0);
+        ASSERT_EQ(etalon, second.buffer_get(second));
     }
 
     return EXIT_SUCCESS;
@@ -56,6 +50,6 @@ int send_to_server()
 int main()
 {
     int result{EXIT_SUCCESS};
-    result += send_to_server();
+    result += tcp_test();
     return result;
 }

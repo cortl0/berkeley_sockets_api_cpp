@@ -1,9 +1,8 @@
-/*
- *   Binary Neurons Network
+/**
+ *   berkeley_sockets
  *   created by Ilya Shishkin
  *   cortl@8iter.ru
- *   http://8iter.ru/ai.html
- *   https://github.com/cortl0/binary_neurons_network
+ *   https://github.com/cortl0/berkeley_sockets_api_cpp
  *   licensed by GPL v3.0
  */
 
@@ -11,31 +10,34 @@
 #define BERKELEY_SOCKETS_UNIT_TESTS_COMMON_H
 
 #include <iostream>
+#include <string>
 
-using namespace std::string_literals;
 
 #define place_string std::string().append(std::string(__FUNCTION__)).append(": ").append(__FILE__).append(": ").append(std::to_string(__LINE__))
-#define log_string(msg) std::string().append(msg).append(" | at: ").append(place_string)
-#define logging(msg) std::cout << log_string(msg) << std::endl
+#define log_string(msg) std::string().append((msg)).append(" | at: ").append(place_string)
+#define logging(msg) std::cout << log_string((msg)) << std::endl
 
 #define ASSERT_EQ(x, y)\
-if((x) != (y))\
 {\
-    logging("error: expected ["s + std::to_string(x) + "], actual ["s + std::to_string(y) + "]"s);\
-    return EXIT_FAILURE;\
+    if((x) != (y))\
+    {\
+        logging("error: not equivalent");\
+        std::cerr << "expected: [" << x << "], actual: [" << y << "]" << std::endl;\
+        return EXIT_FAILURE;\
+    }\
 }
 
 #define ASSERT_TRUE(x)\
 if(!(x))\
 {\
-    logging("error: not true"s);\
+    logging("error: not true");\
     return EXIT_FAILURE;\
 }
 
 #define ASSERT_FALSE(x)\
 if((x))\
 {\
-    logging("error: not false"s);\
+    logging("error: not false");\
     return EXIT_FAILURE;\
 }
 
