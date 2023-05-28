@@ -6,21 +6,21 @@
  *   licensed by GPL v3.0
  */
 
-#ifndef COMMUNICATE_UDP_SERVER_H
-#define COMMUNICATE_UDP_SERVER_H
+#ifndef COMMUNICATE_UDP_PEER_H
+#define COMMUNICATE_UDP_PEER_H
 
 #include "communicate/communicator.h"
 
 namespace communicate::udp
 {
 
-class server : public communicator
+class peer : public communicator
 {
 public:
-    ~server();
-    bool initialize(address local);
+    ~peer();
+    bool initialize(address* local);
 };
 
 } // namespace communicate::udp
 
-#endif // COMMUNICATE_UDP_SERVER_H
+#endif // COMMUNICATE_UDP_PEER_H

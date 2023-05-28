@@ -23,8 +23,7 @@ set(SOURCE
 	communicate/communicator.cpp
 	communicate/tcp/client.cpp
 	communicate/tcp/server.cpp
-	communicate/udp/client.cpp
-	communicate/udp/server.cpp
+	communicate/udp/peer.cpp
 )
 
 add_library(${CMAKE_PROJECT_NAME} ${SOURCE})

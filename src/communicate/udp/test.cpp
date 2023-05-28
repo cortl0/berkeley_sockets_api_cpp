@@ -9,47 +9,46 @@
 #include <iostream>
 #include <thread>
 
-#include "communicate/udp/client.h"
-#include "communicate/udp/server.h"
+#include "communicate/udp/peer.h"
 #include "unit_tests/common.h"
 
-constexpr uint16_t server_port{60003};
-constexpr uint16_t client_port{60004};
+constexpr uint16_t receiver_port{60003};
+constexpr uint16_t sender_port{60004};
 const std::string localhost{"127.0.0.1"};
-const std::string server_ip{localhost};
-const std::string client_ip{localhost};
+const std::string receiver_ip{localhost};
+const std::string sender_ip{localhost};
 
-int tcp_test()
+int udp_test()
 {
-    communicate::address server_local_address;
+    communicate::address receiver_local_address;
 #ifdef FULL_ADDRESS_TEST
-    server_local_address.set_ip(server_ip);
+    receiver_local_address.set_ip(receiver_ip);
 #endif
-    server_local_address.set_port(server_port);
+    receiver_local_address.set_port(receiver_port);
 
-    communicate::address client_local_address;
+    communicate::address sender_local_address;
 #ifdef FULL_ADDRESS_TEST
-    client_local_address.set_ip(client_ip);
-    client_local_address.set_port(client_port);
+    sender_local_address.set_ip(sender_ip);
+    sender_local_address.set_port(sender_port);
 #endif
 
-    communicate::address client_remote_address;
-    client_remote_address.set_ip(server_ip);
-    client_remote_address.set_port(server_port);
+    communicate::address sender_remote_address;
+    sender_remote_address.set_ip(receiver_ip);
+    sender_remote_address.set_port(receiver_port);
 
-    communicate::udp::server server;
-    ASSERT_TRUE(server.initialize(server_local_address));
+    communicate::udp::peer reciever;
+    ASSERT_TRUE(reciever.initialize(&receiver_local_address));
 
-    communicate::udp::client client;
-    ASSERT_TRUE(client.initialize(&client_local_address));
+    communicate::udp::peer sender;
+    ASSERT_TRUE(sender.initialize(&sender_local_address));
 
     const auto etalon = std::string("123abc");
     communicate::buffer first_buffer;
     communicate::buffer second_buffer;
     first_buffer.from_string(etalon);
 
-    ASSERT_TRUE(client.send(first_buffer, client_remote_address) > 0);
-    ASSERT_TRUE(server.receive(second_buffer) > 0);
+    ASSERT_TRUE(sender.send(first_buffer, sender_remote_address) > 0);
+    ASSERT_TRUE(reciever.receive(second_buffer) > 0);
     ASSERT_EQ(etalon, second_buffer.to_string());
 
     return EXIT_SUCCESS;
@@ -58,6 +57,6 @@ int tcp_test()
 int main()
 {
     int result{EXIT_SUCCESS};
-    result += tcp_test();
+    result += udp_test();
     return result;
 }

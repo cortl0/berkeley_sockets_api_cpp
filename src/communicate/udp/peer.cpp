@@ -6,18 +6,18 @@
  *   licensed by GPL v3.0
  */
 
-#include "communicate/udp/client.h"
+#include "communicate/udp/peer.h"
 
 #include <iostream>
 
 namespace communicate::udp
 {
 
-client::~client()
+peer::~peer()
 {
 }
 
-bool client::initialize(address* local)
+bool peer::initialize(address* local)
 {
     log = [](const std::string& s){ std::cout << s << std::endl; };
 
