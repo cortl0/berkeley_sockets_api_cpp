@@ -9,25 +9,25 @@
 #include "communicate/tcp/client.h"
 
 #include <iostream>
-#include <thread>
 
 namespace communicate::tcp
 {
 
 client::~client()
 {
-    // if(-1 == shutdown(communicator_.file_descriptor, SHUT_RDWR))
-    //     communicator_.log(ERROR_STRING_BY_ERRNO);
 }
 
-bool client::initialize(address local, address remote)
+bool client::initialize(address* local, address remote)
 {
-    communicator_.log = [](const std::string& s){ std::cout << s << std::endl; };
+    log = [](const std::string& s){ std::cout << s << std::endl; };
 
-    if(!communicator_.initialize(SOCK_STREAM, IPPROTO_TCP))
+    if(!socket(SOCK_STREAM, IPPROTO_TCP))
         return false;
 
-    if(-1 == connect(communicator_.file_descriptor, &remote.address_.sockaddr_, remote.length))
+    if(local && !bind(*local))
+        return false;
+
+    if(!connect(remote))
         return false;
 
     return true;

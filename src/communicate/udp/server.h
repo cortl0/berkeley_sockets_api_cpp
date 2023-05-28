@@ -14,15 +14,11 @@
 namespace communicate::udp
 {
 
-class server
+class server : public communicator
 {
 public:
     ~server();
-    bool initialize(address local, address remote);
-    void start(bool& stop);
-
-//private:
-    communicator communicator_;
+    bool initialize(address local);
 };
 
 } // namespace communicate::udp

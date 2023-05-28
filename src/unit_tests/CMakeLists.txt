@@ -13,6 +13,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
+#add_compile_definitions(FULL_ADDRESS_TEST)
+
 set(UDP_TEST_BIN_NAME udp_test)
 add_executable(${UDP_TEST_BIN_NAME} ${CMAKE_SOURCE_DIR}/communicate/udp/test.cpp)
 target_link_libraries(${UDP_TEST_BIN_NAME} pthread berkeley_sockets)

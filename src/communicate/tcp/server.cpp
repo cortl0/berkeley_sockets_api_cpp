@@ -20,87 +20,58 @@ server::~server()
 
 bool server::initialize(address local)
 {
-    communicator_.log = [](const std::string& s){ std::cout << s << std::endl; };
+    log = [](const std::string& s){ std::cout << s << std::endl; };
 
-    if(!communicator_.initialize(SOCK_STREAM, IPPROTO_TCP))
+    if(!socket(SOCK_STREAM, IPPROTO_TCP))
         return false;
 
-    if(-1 == bind(communicator_.file_descriptor, &local.address_.sockaddr_, local.length))
+    if(!bind(local))
         return false;
 
-    if(-1 == listen(communicator_.file_descriptor, 10))
-    {
-        communicator_.log(ERROR_STRING_BY_ERRNO);
+    if(!listen())
         return false;
-    }
 
     return true;
 }
 
-void server::start(bool& stop)
+bool server::start(bool& stop)
 {
     using namespace std::chrono_literals;
 
     while(!stop)
     {
-        int connect_file_descriptor = accept(communicator_.file_descriptor, nullptr, nullptr);
+        int new_file_descriptor = accept();
 
-        if(-1 == connect_file_descriptor)
-        {
-            communicator_.log(ERROR_STRING_BY_ERRNO);
-            break;
-        }
-
-        if(stop)
-        {
-            shutdown(connect_file_descriptor, SHUT_RDWR);
-
-            close(connect_file_descriptor);
-
-            break;
-        }
-
-        bool ok = false;
+        if(socket_error == new_file_descriptor)
+            return false;
 
         std::thread([&]()
         {
-            try
+            int file_descriptor = new_file_descriptor;
+
+            while(!stop)
             {
-                int connect_file_descriptor_ = connect_file_descriptor;
-                ok = true;
-                address a;
+                buffer b;
+                ssize_t number_of_bytes = receive(file_descriptor, b);
 
-                while(!stop)
+                if(socket_error == number_of_bytes)
+                    break;
+
+                if(0 < number_of_bytes)
                 {
-                    buffer b;
-                    ssize_t number_of_bytes = communicator_.receive(connect_file_descriptor_, b);
+                    number_of_bytes = send(file_descriptor, b);
 
-                    if(-1 == number_of_bytes)
-                    {
-                        communicator_.log(ERROR_STRING_BY_ERRNO);
+                    if(socket_error == number_of_bytes)
                         break;
-                    }
-
-                    if(0 < number_of_bytes)
-                    {
-                        number_of_bytes = communicator_.send(connect_file_descriptor_, b);
-
-                        if(-1 == number_of_bytes)
-                        {
-                            communicator_.log(ERROR_STRING_BY_ERRNO);
-                            break;
-                        }
-                    }
                 }
+            }
 
-                shutdown(connect_file_descriptor_, SHUT_RDWR);
-                close(connect_file_descriptor_);
-            } catch(...) { }
+            shutdown(file_descriptor);
+            close(file_descriptor);
         }).detach();
-
-        while(!ok)
-            usleep(10);
     }
+
+    return true;
 }
 
 } // namespace communicate::tcp

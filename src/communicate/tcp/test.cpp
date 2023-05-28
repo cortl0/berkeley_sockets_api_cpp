@@ -14,35 +14,45 @@
 
 constexpr uint16_t server_port{60001};
 constexpr uint16_t client_port{60002};
+const std::string localhost{"127.0.0.1"};
+const std::string server_ip{localhost};
+const std::string client_ip{localhost};
 
 int tcp_test()
 {
-    communicate::tcp::server server;
     bool stop{false};
 
-    {
-        communicate::address server_local_address;
-        server_local_address.set_port(server_port);
-        ASSERT_TRUE(server.initialize(server_local_address));
-        std::thread([&](){ server.start(stop); }).detach();
-    }
+    communicate::address server_local_address;
+#ifdef FULL_ADDRESS_TEST
+    server_local_address.set_ip(server_ip);
+#endif
+    server_local_address.set_port(server_port);
 
-    {
-        const auto etalon = std::string("12345");
-        communicate::buffer first;
-        communicate::buffer second;
-        communicate::tcp::client client;
-        communicate::address client_remote_address;
-        communicate::address client_local_address;
-        client_remote_address.set_ip("127.0.0.1");
-        client_remote_address.set_port(server_port);
-        ASSERT_TRUE(client.initialize(client_local_address, client_remote_address));
-        first.buffer_set(first, etalon);
+    communicate::address client_local_address;
+#ifdef FULL_ADDRESS_TEST
+    client_local_address.set_ip(client_ip);
+    client_local_address.set_port(client_port);
+#endif
 
-        ASSERT_TRUE(client.communicator_.send(first) > 0);
-        ASSERT_TRUE(client.communicator_.receive(second) > 0);
-        ASSERT_EQ(etalon, second.buffer_get(second));
-    }
+    communicate::address client_remote_address;
+    client_remote_address.set_ip(server_ip);
+    client_remote_address.set_port(server_port);
+
+    communicate::tcp::server server;
+    ASSERT_TRUE(server.initialize(server_local_address));
+    std::thread([&](){ EXPECT_TRUE(server.start(stop)); }).detach();
+
+    communicate::tcp::client client;
+    ASSERT_TRUE(client.initialize(&client_local_address, client_remote_address));
+
+    const auto etalon = std::string("123abc");
+    communicate::buffer first_buffer;
+    communicate::buffer second_buffer;
+    first_buffer.from_string(etalon);
+
+    ASSERT_TRUE(client.send(first_buffer) > 0);
+    ASSERT_TRUE(client.receive(second_buffer) > 0);
+    ASSERT_EQ(etalon, second_buffer.to_string());
 
     return EXIT_SUCCESS;
 }

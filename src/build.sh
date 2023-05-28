@@ -11,4 +11,4 @@ mkdir build
 cd build
 cmake ..
 make
-ctest --verbose
+ctest

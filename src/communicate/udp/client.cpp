@@ -17,11 +17,14 @@ client::~client()
 {
 }
 
-bool client::initialize(address local, address remote)
+bool client::initialize(address* local)
 {
-    communicator_.log = [](const std::string& s){ std::cout << s << std::endl; };
+    log = [](const std::string& s){ std::cout << s << std::endl; };
 
-    if(!communicator_.initialize(SOCK_DGRAM, IPPROTO_UDP))
+    if(!socket(SOCK_DGRAM, IPPROTO_UDP))
+        return false;
+
+    if(local && !bind(*local))
         return false;
 
     return true;

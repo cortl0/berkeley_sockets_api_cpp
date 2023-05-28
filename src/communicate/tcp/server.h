@@ -14,15 +14,12 @@
 namespace communicate::tcp
 {
 
-class server
+class server : public communicator
 {
 public:
     ~server();
     bool initialize(address local);
-    void start(bool& stop);
-
-private:
-    communicator communicator_;
+    bool start(bool& stop);
 };
 
 } // namespace communicate::tcp
